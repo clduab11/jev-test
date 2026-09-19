@@ -171,7 +171,7 @@ Grading the benchmark sends questions, reference answers, evidence, and answers 
 | Grading: SimpleQA, citation support, the four bars | done, prompts committed under `harness/grading/prompts/` |
 | 500-question SimpleQA snapshot | freezing, paced; after the first twenty questions the public search engines started refusing requests, so most questions so far hold ten results from one engine. Short questions will be re-searched once the engines recover; no headline comes from this snapshot before that. See [CHANGELOG.md](CHANGELOG.md). |
 | FreshQA loader | done; the sheet holds 155 fast-changing questions, so the track uses all of them |
-| Versions C-self, C-laya, C-classical, E | C-self has a working judge client, not yet run as a version; the rest are next |
+| Versions C-self, C-laya, C-classical, E | C-self has a judge client and a first two-question run; C-laya has a local server shim tested against a stand-in model, with Laya itself not yet installed; C-classical and E are next |
 | Memory experiment (second pass) | the write-back runs; the second pass is next |
 | The Space | not started |
 
@@ -190,6 +190,7 @@ jev-test/
       base.py                  the Judge protocol, answer types, cache key
       http.py                  Jev, LitJev, and the Laya shim: anything speaking /v1/systemone
       adapter.py               Gemma judging itself through system-one-adapter (arm C-self)
+      laya_shim.py             serves Laya on /v1/systemone for arm C-laya
       classical.py             bge-reranker, an NLI model, and Prompt-Guard (not written yet)
     retrieval/
       searxng.py               JSON client
@@ -199,7 +200,7 @@ jev-test/
       fuse.py                  reciprocal rank fusion and the evidence caps
     generate/openai_compat.py  talks to llama-server or Unsloth Desktop
     stages/                    s0_intake.py  s1_gate.py  s2_sufficiency.py  s3_generate.py  s4_verify.py  m2_writeback.py
-    arms/                      a_plain.py  b_naive.py  d_jev.py  (c_laya, c_classical, c_self, e_ceiling to come)
+    arms/                      a_plain.py  b_naive.py  d_jev.py  c_self.py  (c_laya, c_classical, e_ceiling to come)
     grading/                   crag_score.py  simpleqa.py  claim_support.py  prereg.py  prompts/
     datasets/                  simpleqa.py  freshqa.py  loaders only, no copied data
     run.py                     --arm D --dataset simpleqa --snapshot <id>, and --grade

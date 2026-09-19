@@ -170,6 +170,9 @@ def run_arm(
             **totals,
         }
         payload["memory_palace"] = {"path": str(memory_path), "drawers": memory_palace.count() if memory_palace else 0}
+        if getattr(judge, "failures", 0):
+            payload["judge"]["fallback_answers"] = int(judge.failures)
+            log(f"judge failed to answer {judge.failures} request(s); those got the do-not-know fallback")
     payload["records"] = records
     out_dir.mkdir(parents=True, exist_ok=True)
     path = results_path(out_dir, arm, dataset, snapshot)

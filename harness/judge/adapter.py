@@ -11,10 +11,16 @@ Same disk cache and cache key as HttpJudge, under a model id prefixed
 ``self:`` so a Gemma answer can never be mistaken for a Jev answer. The
 responding model id from the provider is logged with every answer set.
 
-Local endpoints: the Unsloth Desktop proxy answers 401 to any bearer token it
-did not issue and accepts requests that carry no Authorization header. The
-OpenAI SDK always attaches one, so with an empty ``api_key`` the header is
-removed by an httpx request hook just before the request leaves.
+Two things found on the first smoke test (2026-09-19) and handled here:
+
+* The Unsloth Desktop proxy answers 401 to any bearer token it did not issue
+  and accepts requests with no Authorization header. The OpenAI SDK always
+  attaches one, so with an empty ``api_key`` an httpx request hook removes it.
+* The small model sometimes returns no valid answer set even after the
+  adapter's retry. Rather than abort a run, the judge then answers "do not
+  know": 0.5 for a noul, a uniform distribution for a choice. The event is
+  counted in ``failures`` and marked ``fallback`` in the cache entry, so a
+  result file can say how often the small model failed to judge at all.
 """
 
 from __future__ import annotations
@@ -46,6 +52,35 @@ def _plain(answer: Any) -> dict[str, Any]:
         elif "score" in data:
             data["type"] = "score"
     return data
+
+
+def fallback_answers(questions: Mapping[str, Question]) -> dict[str, dict[str, Any]]:
+    """The "do not know" answer set: 0.5 for a noul, uniform for a choice or score."""
+    out: dict[str, dict[str, Any]] = {}
+    for qid, question in questions.items():
+        kind = question.get("type")
+        if kind == "noul":
+            out[qid] = {"type": "noul", "noul": 0.5}
+        elif kind == "choice":
+            keys = [str(k) for k in (question.get("criteria") or {})]
+            n = max(1, len(keys))
+            out[qid] = {
+                "type": "choice",
+                "choice": keys[0] if keys else "",
+                "probabilities": {k: 1.0 / n for k in keys},
+                "confidence": 1.0 / n,
+            }
+        elif kind == "score":
+            criteria = list(question.get("criteria") or [])
+            n = max(1, len(criteria))
+            out[qid] = {
+                "type": "score",
+                "score": 0.5,
+                "probabilities": {str(i): 1.0 / n for i in range(n)},
+                "legend": {str(i): str(c) for i, c in enumerate(criteria)},
+                "confidence": 1.0 / n,
+            }
+    return out
 
 
 def _strip_authorization(request: Any) -> None:
@@ -85,6 +120,7 @@ class AdapterJudge:
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.max_workers = max(1, int(max_workers))
+        self.failures = 0
         self._provider = OpenAIProvider(model, base_url=base_url, api_key=api_key or "local", api=api)
         if not api_key:
             self._provider._client = _client_without_auth(base_url, timeout)
@@ -135,22 +171,38 @@ class AdapterJudge:
         key = cache_key(self.model, state, questions)
         path = self._cache_path(key)
         if path.exists():
-            return self._to_response(json.loads(path.read_text(encoding="utf-8")), cached=True)
-        response = self._client.system_one(state, questions)
-        answers = {qid: _plain(a) for qid, a in dict(response.answers).items()}
-        usage = response.usage
-        usage_dict = usage.model_dump() if hasattr(usage, "model_dump") else dict(usage or {})
-        entry = {
-            "model": self.model,
-            "provider_model": getattr(response, "model", None) or self.provider_model,
-            "answers": answers,
-            "usage": {
-                "input_tokens": usage_dict.get("input_tokens", 0),
-                "output_tokens": usage_dict.get("output_tokens", 0),
-                "raw": usage_dict,
-            },
-            "request": {"model": self.model, "state": state, "questions": questions},
-        }
+            entry = json.loads(path.read_text(encoding="utf-8"))
+            if entry.get("fallback"):
+                self.failures += 1
+            return self._to_response(entry, cached=True)
+        request = {"model": self.model, "state": state, "questions": questions}
+        try:
+            response = self._client.system_one(state, questions)
+        except Exception as exc:  # noqa: BLE001 - the small model failed to judge; record it, do not abort
+            self.failures += 1
+            entry = {
+                "model": self.model,
+                "provider_model": self.provider_model,
+                "answers": fallback_answers(questions),
+                "usage": {"input_tokens": 0, "output_tokens": 0},
+                "fallback": True,
+                "error": f"{type(exc).__name__}: {exc}"[:300],
+                "request": request,
+            }
+        else:
+            usage = response.usage
+            usage_dict = usage.model_dump() if hasattr(usage, "model_dump") else dict(usage or {})
+            entry = {
+                "model": self.model,
+                "provider_model": getattr(response, "model", None) or self.provider_model,
+                "answers": {qid: _plain(a) for qid, a in dict(response.answers).items()},
+                "usage": {
+                    "input_tokens": usage_dict.get("input_tokens", 0),
+                    "output_tokens": usage_dict.get("output_tokens", 0),
+                    "raw": usage_dict,
+                },
+                "request": request,
+            }
         out = self._to_response(entry, cached=False)
         self._write_cache(key, entry)
         return out
