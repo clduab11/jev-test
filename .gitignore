@@ -1,0 +1,36 @@
+# secrets
+.env
+
+# judge response cache: attach to a release, do not track
+json_cache/*
+!json_cache/.gitkeep
+
+# frozen retrieval snapshot lives in the MemPalace palace directory
+palace/
+*.sqlite3
+chroma*/
+
+# datasets are downloaded by loaders, never committed
+data/
+datasets/raw/
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+.uv/
+*.egg-info/
+dist/
+build/
+
+# tooling
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+
+# os / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.zed/
