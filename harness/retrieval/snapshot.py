@@ -67,6 +67,12 @@ def _write_manifest(snapshot_id: str, manifest: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".json.tmp")
     tmp.write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
+    for attempt in range(20):
+        try:
+            tmp.replace(path)
+            return
+        except PermissionError:  # Windows: a reader has the file open; wait, then try again
+            time.sleep(0.25 * (attempt + 1))
     tmp.replace(path)
 
 
@@ -79,14 +85,13 @@ def _sha256(text: str) -> str:
 
 
 def _load_questions(dataset: str, n: int, seed: int, question_ids: list[str] | None) -> list[dict[str, Any]]:
-    if dataset != "simpleqa":
-        raise ValueError(f"unknown dataset {dataset!r}; only simpleqa is wired up so far")
-    from harness.datasets import simpleqa
+    from harness import datasets
 
+    loader = datasets.module(dataset)
     if question_ids:
-        rows = simpleqa.by_id(question_ids)
+        rows = loader.by_id(question_ids)
         return [rows[qid] for qid in question_ids]
-    return simpleqa.subset(n=n, seed=seed)
+    return loader.subset(n=n, seed=seed)
 
 
 def _fetch_all(urls: list[str], workers: int, timeout: float) -> list[fetchmod.FetchResult]:
@@ -189,9 +194,17 @@ def freeze(
     time_range: str | None = None,
     workers: int = 8,
     fetch_timeout: float = 10.0,
+    sleep_s: float = 0.0,
+    redo_below: int | None = None,
     log=print,
 ) -> dict[str, Any]:
-    """Freeze search results and pages for a question set. Resumes if interrupted."""
+    """Freeze search results and pages for a question set. Resumes if interrupted.
+
+    ``sleep_s`` waits between searches so public engines are not suspended for
+    too many requests. ``redo_below`` re-searches every frozen question that
+    got fewer than that many results and replaces its manifest entry; chunks
+    already in the palace are de-duplicated by (url, chunk_index).
+    """
     if not snapshot_id:
         raise ValueError("snapshot_id is required")
     rows = _load_questions(dataset, n, seed, question_ids)
@@ -199,7 +212,7 @@ def freeze(
     if path.exists():
         manifest = load_manifest(snapshot_id)
     else:
-        from harness.datasets import simpleqa
+        from harness import datasets
 
         manifest = {
             "snapshot_id": snapshot_id,
@@ -208,7 +221,7 @@ def freeze(
             "seed": seed,
             "n": n,
             "question_ids": [r["question_id"] for r in rows],
-            "dataset_source": simpleqa.source_info() if dataset == "simpleqa" else None,
+            "dataset_source": datasets.module(dataset).source_info(),
             "searxng_url": searxng.base_url(),
             "category": category,
             "time_range": time_range,
@@ -221,21 +234,34 @@ def freeze(
             "created_at": fetchmod.now_iso(),
             "questions": [],
         }
-    done = {q["question_id"] for q in manifest["questions"]}
+    existing = {q["question_id"]: q for q in manifest["questions"]}
+    done = {qid for qid, q in existing.items() if redo_below is None or q["n_results"] >= redo_below}
     palace = open_palace(palace_path(snapshot_id))
+    searched_any = False
     for index, row in enumerate(rows, 1):
         if row["question_id"] in done:
             continue
+        if sleep_s and searched_any:
+            time.sleep(sleep_s)
+        searched_any = True
         started = time.perf_counter()
         entry = freeze_question(palace, snapshot_id, dataset, row, category, time_range, workers, fetch_timeout)
-        manifest["questions"].append(entry)
+        if row["question_id"] in existing:
+            manifest["questions"] = [
+                entry if q["question_id"] == row["question_id"] else q for q in manifest["questions"]
+            ]
+        else:
+            manifest["questions"].append(entry)
         manifest["updated_at"] = fetchmod.now_iso()
         manifest["palace_drawers"] = palace.count()
         _write_manifest(snapshot_id, manifest)
+        engines = sorted({e for r in entry["results"] for e in r["engines"]})
+        suspended = [u[0] for u in (entry["searxng_raw"].get("unresponsive_engines") or []) if u]
         log(
             f"[{index}/{len(rows)}] {row['question_id']}: {entry['n_results']} results, "
             f"{entry['n_fetched_ok']} pages fetched, {entry['n_chunks']} chunks "
-            f"({entry['n_chunks_new']} new) in {time.perf_counter() - started:.1f}s"
+            f"({entry['n_chunks_new']} new) in {time.perf_counter() - started:.1f}s; "
+            f"engines {','.join(engines) or 'none'}; suspended {','.join(sorted(set(suspended))) or 'none'}"
         )
     return manifest
 
@@ -267,7 +293,9 @@ def replay(snapshot_id: str, question_id: str, palace: Palace | None = None) -> 
                     "text": drawer["text"],
                 }
             )
-        results.append({**result, "fetched": page["error"] is None, "chunks": chunks})
+        results.append(
+            {**result, "fetched": page["error"] is None, "fetched_at": page.get("fetched_at"), "chunks": chunks}
+        )
     if missing:
         raise RuntimeError(
             f"{len(missing)} chunk(s) of {question_id} are missing from the palace or changed: {missing[:3]}"
@@ -315,6 +343,31 @@ def replay_check(snapshot_id: str, log=print) -> bool:
     return ok
 
 
+def engine_report(manifest: dict[str, Any]) -> str:
+    """How many results each question got, and which engines were suspended, so a
+    degraded freeze is visible before anyone runs an arm on it."""
+    questions = manifest["questions"]
+    buckets = {"0": 0, "1-9": 0, "10-29": 0, "30": 0}
+    engines: dict[str, int] = {}
+    suspended: dict[str, int] = {}
+    for q in questions:
+        n = q["n_results"]
+        key = "0" if n == 0 else "1-9" if n < 10 else "10-29" if n < 30 else "30"
+        buckets[key] += 1
+        for r in q["results"]:
+            for e in r["engines"]:
+                engines[e] = engines.get(e, 0) + 1
+        for u in q["searxng_raw"].get("unresponsive_engines") or []:
+            if u:
+                suspended[u[0]] = suspended.get(u[0], 0) + 1
+    lines = [
+        f"questions by result count: {', '.join(f'{k}: {v}' for k, v in buckets.items())}",
+        f"results per engine: {', '.join(f'{k}: {v}' for k, v in sorted(engines.items()))}",
+        f"questions with an engine suspended or failing: {', '.join(f'{k}: {v}' for k, v in sorted(suspended.items())) or 'none'}",
+    ]
+    return "\n".join(lines)
+
+
 def summary_table(manifest: dict[str, Any]) -> str:
     lines = [f"{'question_id':<16} {'results':>7} {'pages':>5} {'chunks':>6} {'new':>5}"]
     for q in manifest["questions"]:
@@ -341,13 +394,22 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--time-range", default=None)
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--fetch-timeout", type=float, default=10.0)
+    parser.add_argument("--sleep", type=float, default=0.0, help="seconds to wait between searches")
+    parser.add_argument("--redo-below", type=int, default=None, help="re-search frozen questions with fewer results than this")
+    parser.add_argument("--report", action="store_true", help="print the result-count and engine report and exit")
     parser.add_argument("--replay-check", action="store_true", help="replay every question offline")
     args = parser.parse_args(argv)
 
+    if args.report:
+        manifest = load_manifest(args.id)
+        print(f"snapshot {args.id}: {len(manifest['questions'])} of {manifest['n']} questions frozen")
+        print(engine_report(manifest))
+        return 0
     if args.replay_check:
         print(f"replaying snapshot {args.id} with the network disabled")
         ok = replay_check(args.id)
         print(summary_table(load_manifest(args.id)))
+        print(engine_report(load_manifest(args.id)))
         return 0 if ok else 1
 
     manifest = freeze(
@@ -359,8 +421,11 @@ def main(argv: list[str] | None = None) -> int:
         time_range=args.time_range,
         workers=args.workers,
         fetch_timeout=args.fetch_timeout,
+        sleep_s=args.sleep,
+        redo_below=args.redo_below,
     )
     print(summary_table(manifest))
+    print(engine_report(manifest))
     print(f"palace drawers: {manifest.get('palace_drawers')}  manifest: {manifest_path(args.id)}")
     return 0
 

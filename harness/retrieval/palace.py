@@ -243,13 +243,15 @@ def search_wing(
     wing: str,
     n: int | None = None,
     max_distance: float | None = None,
+    since: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Semantic search inside one wing. Returns text, drawer_id, similarity and provenance."""
+    """Semantic search inside one wing. Returns text, drawer_id, similarity and provenance.
+    ``since`` is an ISO date floor on authored_at, applied by MemPalace (spec section 3)."""
     t = thresholds()
     n = int(n or t["palace_top_k"])
     max_distance = float(t["palace_max_distance"] if max_distance is None else max_distance)
     envelope = search_memories(
-        query, str(palace.path), wing=wing, n_results=n, max_distance=max_distance
+        query, str(palace.path), wing=wing, n_results=n, max_distance=max_distance, since=since
     )
     hits = envelope.get("results", []) if isinstance(envelope, dict) else []
     return [
@@ -265,6 +267,70 @@ def search_wing(
         }
         for hit in hits
     ]
+
+
+def search_evidence_for_question(
+    palace: Palace,
+    query: str,
+    question_id: str,
+    n: int | None = None,
+    max_distance: float | None = None,
+) -> list[dict[str, Any]]:
+    """Semantic search of the evidence wing restricted to one question's drawers.
+
+    Used by the replay-mode refinement round: a second look at the frozen
+    result set with a different query. Goes to the collection directly because
+    ``search_memories`` has no metadata filter beyond wing and room.
+    """
+    t = thresholds()
+    n = int(n or t["palace_top_k"])
+    max_distance = float(t["palace_max_distance"] if max_distance is None else max_distance)
+    got = palace.collection.query(
+        query_texts=[query],
+        n_results=n,
+        where={"$and": [{"wing": EVIDENCE}, {"query_id": question_id}]},
+        include=["documents", "metadatas", "distances"],
+    )
+    out: list[dict[str, Any]] = []
+    ids = (got.get("ids") or [[]])[0]
+    docs = (got.get("documents") or [[]])[0]
+    metas = (got.get("metadatas") or [[]])[0]
+    dists = (got.get("distances") or [[]])[0]
+    for drawer_id, doc, meta, dist in zip(ids, docs, metas, dists, strict=False):
+        meta = dict(meta or {})
+        if max_distance and dist is not None and float(dist) > max_distance:
+            continue
+        engines = meta.get("engines")
+        out.append(
+            {
+                "drawer_id": drawer_id,
+                "text": doc,
+                "similarity": None if dist is None else 1.0 - float(dist),
+                "distance": dist,
+                "wing": meta.get("wing"),
+                "room": meta.get("room"),
+                "url": meta.get("url"),
+                "title": meta.get("title"),
+                "chunk_index": meta.get("chunk_index"),
+                "engine_rank": meta.get("engine_rank"),
+                "engines": engines.split(",") if isinstance(engines, str) and engines else [],
+                "fetched_at": meta.get("fetched_at"),
+                "authored_at": meta.get("authored_at"),
+            }
+        )
+    return out
+
+
+def flag_drawer(palace: Palace, drawer_id: str, injection_prob: float) -> bool:
+    """Mark a recalled drawer that tripped the injection gate. Returns False if absent."""
+    got = palace.collection.get(ids=[drawer_id], include=["metadatas"])
+    if not got or not got.get("ids"):
+        return False
+    metadata = dict((got.get("metadatas") or [{}])[0] or {})
+    metadata["flagged_injection"] = float(injection_prob)
+    metadata["flagged_at"] = _now()
+    palace.collection.update(ids=[drawer_id], metadatas=[metadata])
+    return True
 
 
 def get_drawers(palace: Palace, drawer_ids: list[str]) -> dict[str, dict[str, Any]]:

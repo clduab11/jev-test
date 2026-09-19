@@ -7,8 +7,9 @@
  "generator_url": "http://127.0.0.1:8888/v1",
  "seed": 20260919,
  "thinking": false,
+ "today": "2026-09-19",
  "n": 20,
- "created_at": "2026-09-19T18:15:37Z",
+ "created_at": "2026-09-19T18:52:45Z",
  "records": [
   {
    "question_id": "simpleqa-0031",
@@ -41,11 +42,14 @@
    ],
    "fabricated_citations": 1,
    "n_sentences": 2,
+   "kept_sentences": [
+    "This collection is considered to be a precursor to modern comics [r01c1, r02c0]."
+   ],
    "answer_raw": "In 1810, François Aimé Louis Dumoulin published a collection of 150 engravings themed on the journey of Robinson Crusoe [r01c1, r02c0, r04s, r31]. This collection is considered to be a precursor to modern comics [r01c1, r02c0].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 2.412,
+   "latency_s": 2.314,
    "prompt_tokens": 9921,
    "completion_tokens": 78,
    "finish_reason": "stop",
@@ -119,7 +123,7 @@
     "ev_167a05a33493f9cd_c6",
     "ev_67a50ea446f716f5_c7"
    ],
-   "wall_s": 2.651,
+   "wall_s": 2.575,
    "grade": {
     "label": "not_attempted",
     "letter": "C",
@@ -136,7 +140,7 @@
    "answer": "Dr. U Kaul is mentioned as Kashmir’s first cardiologist [r04c0]. He is also referred to as Kashmir’s first cardiologist [r04c0].",
    "claims": [
     {
-     "text": "U Kaul is mentioned as Kashmir’s first cardiologist [r04c0].",
+     "text": "Dr. U Kaul is mentioned as Kashmir’s first cardiologist [r04c0].",
      "citations": [
       "r04c0"
      ]
@@ -154,12 +158,16 @@
    "uncited_claims": [],
    "stripped": [],
    "fabricated_citations": 0,
-   "n_sentences": 3,
+   "n_sentences": 2,
+   "kept_sentences": [
+    "Dr. U Kaul is mentioned as Kashmir’s first cardiologist [r04c0].",
+    "He is also referred to as Kashmir’s first cardiologist [r04c0]."
+   ],
    "answer_raw": "Dr. U Kaul is mentioned as Kashmir’s first cardiologist [r04c0]. He is also referred to as Kashmir’s first cardiologist [r04c0].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 7.584,
+   "latency_s": 2.585,
    "prompt_tokens": 13834,
    "completion_tokens": 39,
    "finish_reason": "stop",
@@ -251,7 +259,7 @@
     "ev_94bf96e06ef2806f_c2",
     "ev_4169392bb913d0ac_c3"
    ],
-   "wall_s": 7.636,
+   "wall_s": 2.637,
    "grade": {
     "label": "correct",
     "letter": "A",
@@ -283,11 +291,14 @@
    "stripped": [],
    "fabricated_citations": 0,
    "n_sentences": 1,
+   "kept_sentences": [
+    "Metformin was introduced as a medication in France in 1957 [r03s, r06s]."
+   ],
    "answer_raw": "Metformin was introduced as a medication in France in 1957 [r03s, r06s].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 1.336,
+   "latency_s": 1.184,
    "prompt_tokens": 6084,
    "completion_tokens": 27,
    "finish_reason": "stop",
@@ -343,7 +354,7 @@
     "ev_ef6aa0cf09049c41_c6",
     "ev_e2719657546f1a3d_c7"
    ],
-   "wall_s": 1.388,
+   "wall_s": 1.226,
    "grade": {
     "label": "correct",
     "letter": "A",
@@ -373,11 +384,14 @@
    "stripped": [],
    "fabricated_citations": 0,
    "n_sentences": 1,
+   "kept_sentences": [
+    "Deidre Lang was the only Fly Girl who remained for the entire run of In Living Color, which lasted five seasons [r07c2]."
+   ],
    "answer_raw": "Deidre Lang was the only Fly Girl who remained for the entire run of In Living Color, which lasted five seasons [r07c2].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 2.075,
+   "latency_s": 2.116,
    "prompt_tokens": 11369,
    "completion_tokens": 32,
    "finish_reason": "stop",
@@ -461,7 +475,7 @@
     "ev_8be83d61cc16dd34_c0",
     "ev_6c9f07cb2d4277c5_c1"
    ],
-   "wall_s": 2.122,
+   "wall_s": 2.158,
    "grade": {
     "label": "correct",
     "letter": "A",
@@ -491,11 +505,14 @@
    "stripped": [],
    "fabricated_citations": 0,
    "n_sentences": 1,
+   "kept_sentences": [
+    "Antonio Negri had two daughters, Anna Negri and Francesco [r02c0]."
+   ],
    "answer_raw": "Antonio Negri had two daughters, Anna Negri and Francesco [r02c0].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 7.234,
+   "latency_s": 2.231,
    "prompt_tokens": 12475,
    "completion_tokens": 20,
    "finish_reason": "stop",
@@ -591,7 +608,7 @@
     "ev_286f5fe1338cd699_c3",
     "ev_c50f9579a4702952_c4"
    ],
-   "wall_s": 7.279,
+   "wall_s": 2.275,
    "grade": {
     "label": "incorrect",
     "letter": "B",
@@ -628,11 +645,15 @@
    "stripped": [],
    "fabricated_citations": 0,
    "n_sentences": 2,
+   "kept_sentences": [
+    "San José de la Montaña was founded on March 17, 1916 [r03c3].",
+    "It was officially established as a municipality on October 31, 1964 [r08c1]."
+   ],
    "answer_raw": "San José de la Montaña was founded on March 17, 1916 [r03c3]. It was officially established as a municipality on October 31, 1964 [r08c1].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 1.572,
+   "latency_s": 1.382,
    "prompt_tokens": 6616,
    "completion_tokens": 52,
    "finish_reason": "stop",
@@ -692,7 +713,7 @@
     "ev_b3f9bb3f9e345361_c0",
     "ev_d655de34cb56a50b_c1"
    ],
-   "wall_s": 1.617,
+   "wall_s": 1.425,
    "grade": {
     "label": "correct",
     "letter": "A",
@@ -722,11 +743,14 @@
    "stripped": [],
    "fabricated_citations": 0,
    "n_sentences": 1,
+   "kept_sentences": [
+    "Bindy Johal immigrated to Vancouver, British Columbia with his parents at the age of four [r04c1]."
+   ],
    "answer_raw": "Bindy Johal immigrated to Vancouver, British Columbia with his parents at the age of four [r04c1].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 7.437,
+   "latency_s": 7.614,
    "prompt_tokens": 13601,
    "completion_tokens": 26,
    "finish_reason": "stop",
@@ -820,7 +844,7 @@
     "ev_1f79198ae485557d_c4",
     "ev_11245cbbbc4eb424_c5"
    ],
-   "wall_s": 7.486,
+   "wall_s": 7.663,
    "grade": {
     "label": "correct",
     "letter": "A",
@@ -844,11 +868,15 @@
    "stripped": [],
    "fabricated_citations": 0,
    "n_sentences": 2,
+   "kept_sentences": [
+    "The provided evidence does not contain a letter sent by A.C.",
+    "Bhaktivedanta on December 25, 1956, to Sri Biswambhar Goswami."
+   ],
    "answer_raw": "The provided evidence does not contain a letter sent by A.C. Bhaktivedanta on December 25, 1956, to Sri Biswambhar Goswami.",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 1.765,
+   "latency_s": 1.73,
    "prompt_tokens": 7979,
    "completion_tokens": 40,
    "finish_reason": "stop",
@@ -918,7 +946,7 @@
     "ev_4b9e6dbe2db4f242_c7",
     "ev_f9a1985c910752db_c0"
    ],
-   "wall_s": 1.815,
+   "wall_s": 1.78,
    "grade": {
     "label": "not_attempted",
     "letter": "C",
@@ -955,11 +983,15 @@
    "stripped": [],
    "fabricated_citations": 0,
    "n_sentences": 2,
+   "kept_sentences": [
+    "Matsuzaka's debut in the Major Leagues occurred on April 5, 2007, where he picked up a win and struck out 10 in 7 innings in a 4-1 Boston victory over the Kansas City Royals [r05c7].",
+    "The evidence does not state the specific inning of Game 3 of the '07 World Series when Matsuzaka got his first hit in the Major Leagues [r06c0]."
+   ],
    "answer_raw": "Matsuzaka's debut in the Major Leagues occurred on April 5, 2007, where he picked up a win and struck out 10 in 7 innings in a 4-1 Boston victory over the Kansas City Royals [r05c7]. The evidence does not state the specific inning of Game 3 of the '07 World Series when Matsuzaka got his first hit in the Major Leagues [r06c0].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 2.809,
+   "latency_s": 2.978,
    "prompt_tokens": 13355,
    "completion_tokens": 97,
    "finish_reason": "stop",
@@ -1053,7 +1085,7 @@
     "ev_873976e7ee626ec1_c7",
     "ev_0fc1854b9435d5f2_c0"
    ],
-   "wall_s": 2.864,
+   "wall_s": 3.026,
    "grade": {
     "label": "not_attempted",
     "letter": "C",
@@ -1089,11 +1121,15 @@
    "stripped": [],
    "fabricated_citations": 0,
    "n_sentences": 2,
+   "kept_sentences": [
+    "The group started their first petition drive in 2006, and they continued trying for a long time [r02c1].",
+    "They got started in January 2008, and it took until December 31st to file the petition [r02c1]."
+   ],
    "answer_raw": "The group started their first petition drive in 2006, and they continued trying for a long time [r02c1]. They got started in January 2008, and it took until December 31st to file the petition [r02c1].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 2.708,
+   "latency_s": 3.13,
    "prompt_tokens": 13760,
    "completion_tokens": 61,
    "finish_reason": "stop",
@@ -1187,7 +1223,7 @@
     "ev_b35bc08a55996b64_c7",
     "ev_b7dcbdb5af51414a_c0"
    ],
-   "wall_s": 2.756,
+   "wall_s": 3.2,
    "grade": {
     "label": "correct",
     "letter": "A",
@@ -1225,11 +1261,14 @@
    ],
    "fabricated_citations": 1,
    "n_sentences": 2,
+   "kept_sentences": [
+    "While the original company headquarters were at the Port of Liverpool Building at the Pier Head, it moved to Century Buildings in Liverpool's Brunswick Business Park, and then to South Harrington Building by the docks [r03c3]."
+   ],
    "answer_raw": "The company's headquarters has resided at Wavertree Technology Park since 1995 [r07c7]. While the original company headquarters were at the Port of Liverpool Building at the Pier Head, it moved to Century Buildings in Liverpool's Brunswick Business Park, and then to South Harrington Building by the docks [r03c3].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 2.615,
+   "latency_s": 2.664,
    "prompt_tokens": 12828,
    "completion_tokens": 73,
    "finish_reason": "stop",
@@ -1325,7 +1364,7 @@
     "ev_841b773e54f2a2f7_c4",
     "ev_5d88c66e6ce3f899_c5"
    ],
-   "wall_s": 2.667,
+   "wall_s": 2.736,
    "grade": {
     "label": "incorrect",
     "letter": "B",
@@ -1363,11 +1402,14 @@
    "stripped": [],
    "fabricated_citations": 0,
    "n_sentences": 1,
+   "kept_sentences": [
+    "Clifford Cunnell was born on 31 August 1944 [r01c0, r02c0, r03c0, r04s, r08c0]."
+   ],
    "answer_raw": "Clifford Cunnell was born on 31 August 1944 [r01c0, r02c0, r03c0, r04s, r08c0].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 0.731,
+   "latency_s": 0.728,
    "prompt_tokens": 2749,
    "completion_tokens": 48,
    "finish_reason": "stop",
@@ -1405,7 +1447,7 @@
     "ev_fa7b8c756519146b_c0",
     "ev_2d95efa1a6ad46f7_c0"
    ],
-   "wall_s": 0.775,
+   "wall_s": 0.771,
    "grade": {
     "label": "correct",
     "letter": "A",
@@ -1422,7 +1464,7 @@
    "answer": "Dr. William Schwartz observed that the antibiotic sulfanilamide increased sodium excretion in patients with heart failure, which led to the discovery and development of modern diuretic drugs [r01c0]. Early in his career, he discovered the diuretic properties of sulfanilamide based on a study from 1937 [r04s]. Furthermore, Bill showed in one of his early studies of congestive heart failure that sulfanilamide had natriuretic properties [r02s].",
    "claims": [
     {
-     "text": "William Schwartz observed that the antibiotic sulfanilamide increased sodium excretion in patients with heart failure, which led to the discovery and development of modern diuretic drugs [r01c0].",
+     "text": "Dr. William Schwartz observed that the antibiotic sulfanilamide increased sodium excretion in patients with heart failure, which led to the discovery and development of modern diuretic drugs [r01c0].",
      "citations": [
       "r01c0"
      ]
@@ -1448,12 +1490,17 @@
    "uncited_claims": [],
    "stripped": [],
    "fabricated_citations": 0,
-   "n_sentences": 4,
+   "n_sentences": 3,
+   "kept_sentences": [
+    "Dr. William Schwartz observed that the antibiotic sulfanilamide increased sodium excretion in patients with heart failure, which led to the discovery and development of modern diuretic drugs [r01c0].",
+    "Early in his career, he discovered the diuretic properties of sulfanilamide based on a study from 1937 [r04s].",
+    "Furthermore, Bill showed in one of his early studies of congestive heart failure that sulfanilamide had natriuretic properties [r02s]."
+   ],
    "answer_raw": "Dr. William Schwartz observed that the antibiotic sulfanilamide increased sodium excretion in patients with heart failure, which led to the discovery and development of modern diuretic drugs [r01c0]. Early in his career, he discovered the diuretic properties of sulfanilamide based on a study from 1937 [r04s]. Furthermore, Bill showed in one of his early studies of congestive heart failure that sulfanilamide had natriuretic properties [r02s].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 1.586,
+   "latency_s": 1.691,
    "prompt_tokens": 6196,
    "completion_tokens": 99,
    "finish_reason": "stop",
@@ -1511,7 +1558,7 @@
     "ev_d6fc8933e490953f_c6",
     "ev_129ee49160a2ccae_c7"
    ],
-   "wall_s": 1.638,
+   "wall_s": 1.735,
    "grade": {
     "label": "incorrect",
     "letter": "B",
@@ -1555,11 +1602,16 @@
    "stripped": [],
    "fabricated_citations": 0,
    "n_sentences": 3,
+   "kept_sentences": [
+    "The title of the firework display that Cornelia Parker showed at the opening of Jupiter Artland was 'Nocturne (A Moon Landing)' [r01s].",
+    "This display incorporated fragments of an actual lunar meteorite [r03c1].",
+    "The artwork was inspired by the Whistler painting \"Nocturne In Black And Gold: The Falling Rocket\" [r04c0]."
+   ],
    "answer_raw": "The title of the firework display that Cornelia Parker showed at the opening of Jupiter Artland was 'Nocturne (A Moon Landing)' [r01s]. This display incorporated fragments of an actual lunar meteorite [r03c1]. The artwork was inspired by the Whistler painting \"Nocturne In Black And Gold: The Falling Rocket\" [r04c0].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 2.635,
+   "latency_s": 3.081,
    "prompt_tokens": 13052,
    "completion_tokens": 79,
    "finish_reason": "stop",
@@ -1655,7 +1707,7 @@
     "ev_7f860143019e4494_c4",
     "ev_33f389c8c4caab95_c5"
    ],
-   "wall_s": 2.683,
+   "wall_s": 3.146,
    "grade": {
     "label": "correct",
     "letter": "A",
@@ -1685,11 +1737,14 @@
    "stripped": [],
    "fabricated_citations": 0,
    "n_sentences": 1,
+   "kept_sentences": [
+    "Victor Newman's first wife was Nikki Reed, and he eventually had a long-standing romantic history with Ashley Abbott, with whom he shared a child, Abby Newman [r07c1]."
+   ],
    "answer_raw": "Victor Newman's first wife was Nikki Reed, and he eventually had a long-standing romantic history with Ashley Abbott, with whom he shared a child, Abby Newman [r07c1].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 2.247,
+   "latency_s": 7.417,
    "prompt_tokens": 11743,
    "completion_tokens": 41,
    "finish_reason": "stop",
@@ -1779,7 +1834,7 @@
     "ev_dda31d6365dd4ed4_c6",
     "ev_c9e84186f55541f1_c7"
    ],
-   "wall_s": 2.298,
+   "wall_s": 7.482,
    "grade": {
     "label": "incorrect",
     "letter": "B",
@@ -1809,11 +1864,14 @@
    "stripped": [],
    "fabricated_citations": 0,
    "n_sentences": 1,
+   "kept_sentences": [
+    "In December 1972, the UN General Assembly unanimously elected Maurice Strong to be the first head of UN Environment [r07s]."
+   ],
    "answer_raw": "In December 1972, the UN General Assembly unanimously elected Maurice Strong to be the first head of UN Environment [r07s].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 6.968,
+   "latency_s": 2.107,
    "prompt_tokens": 10830,
    "completion_tokens": 31,
    "finish_reason": "stop",
@@ -1897,7 +1955,7 @@
     "ev_57ce8bc6fcb69da1_c6",
     "ev_cc7510dcdad3bd07_c7"
    ],
-   "wall_s": 7.017,
+   "wall_s": 2.156,
    "grade": {
     "label": "correct",
     "letter": "A",
@@ -1934,11 +1992,15 @@
    "stripped": [],
    "fabricated_citations": 0,
    "n_sentences": 2,
+   "kept_sentences": [
+    "Roberto Battaglia won a gold medal in the team épée event at the 1952 Summer Olympics [r01c0].",
+    "His team won a gold medal in the team épée event at the 1952 Summer Olympics [r03s]."
+   ],
    "answer_raw": "Roberto Battaglia won a gold medal in the team épée event at the 1952 Summer Olympics [r01c0]. His team won a gold medal in the team épée event at the 1952 Summer Olympics [r03s].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 1.938,
+   "latency_s": 6.86,
    "prompt_tokens": 8896,
    "completion_tokens": 57,
    "finish_reason": "stop",
@@ -2010,7 +2072,7 @@
     "ev_a9a28e05aa5f8f49_c6",
     "ev_0331beb878372299_c7"
    ],
-   "wall_s": 1.991,
+   "wall_s": 6.902,
    "grade": {
     "label": "correct",
     "letter": "A",
@@ -2040,11 +2102,14 @@
    "stripped": [],
    "fabricated_citations": 0,
    "n_sentences": 1,
+   "kept_sentences": [
+    "In 1999, Dennis Ichiyama became the designer-in-residence at the Hamilton Wood Type and Printing Museum in Two Rivers, Wisconsin, working with historic wood type [r03s]."
+   ],
    "answer_raw": "In 1999, Dennis Ichiyama became the designer-in-residence at the Hamilton Wood Type and Printing Museum in Two Rivers, Wisconsin, working with historic wood type [r03s].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 1.661,
+   "latency_s": 2.025,
    "prompt_tokens": 8675,
    "completion_tokens": 44,
    "finish_reason": "stop",
@@ -2116,7 +2181,7 @@
     "ev_85e4dc84ef3c9129_c2",
     null
    ],
-   "wall_s": 1.704,
+   "wall_s": 2.064,
    "grade": {
     "label": "correct",
     "letter": "A",
@@ -2154,11 +2219,15 @@
    "stripped": [],
    "fabricated_citations": 0,
    "n_sentences": 2,
+   "kept_sentences": [
+    "The provided evidence does not state which two teams qualified for the Europa League group stage via Premier League standings at the end of the 2021-2022 season [r03c0, r05c0].",
+    "It only mentions that the 32 teams in the group stage were decided after the qualifying stage [r03c0]."
+   ],
    "answer_raw": "The provided evidence does not state which two teams qualified for the Europa League group stage via Premier League standings at the end of the 2021-2022 season [r03c0, r05c0]. It only mentions that the 32 teams in the group stage were decided after the qualifying stage [r03c0].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 7.787,
+   "latency_s": 7.995,
    "prompt_tokens": 13607,
    "completion_tokens": 76,
    "finish_reason": "stop",
@@ -2254,7 +2323,7 @@
     "ev_2a1bc633a9d01ec6_c2",
     "ev_0bed3b682abf9358_c3"
    ],
-   "wall_s": 7.835,
+   "wall_s": 8.062,
    "grade": {
     "label": "not_attempted",
     "letter": "C",
@@ -2299,11 +2368,16 @@
    "stripped": [],
    "fabricated_citations": 0,
    "n_sentences": 3,
+   "kept_sentences": [
+    "By December 2019, Morris Villarroel had accumulated 307 notebooks documenting the granular details of his existence [r05c0, r06c0].",
+    "This count represents nearly a decade of radical transparency with himself [r06c0].",
+    "Villarroel estimated that he spent about an hour every day just writing down things in his logbook [r05c1]."
+   ],
    "answer_raw": "By December 2019, Morris Villarroel had accumulated 307 notebooks documenting the granular details of his existence [r05c0, r06c0]. This count represents nearly a decade of radical transparency with himself [r06c0]. Villarroel estimated that he spent about an hour every day just writing down things in his logbook [r05c1].",
    "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
    "seed": 20260919,
    "thinking": false,
-   "latency_s": 2.836,
+   "latency_s": 2.8,
    "prompt_tokens": 12643,
    "completion_tokens": 85,
    "finish_reason": "stop",
@@ -2397,7 +2471,7 @@
     "ev_fa70ae15ff9d2ba0_c5",
     "ev_840cbfd6f5d34953_c6"
    ],
-   "wall_s": 2.891,
+   "wall_s": 2.84,
    "grade": {
     "label": "correct",
     "letter": "A",
@@ -2433,7 +2507,7 @@
    "seed": 20260919
   },
   "grader_model": "claude-sonnet-5",
-  "graded_at": "2026-09-19T18:15:41Z",
+  "graded_at": "2026-09-19T18:52:46Z",
   "fabricated_citations_total": 2
  }
 }

@@ -142,6 +142,11 @@ def count_tokens(text: str, name: str = "cl100k_base") -> int:
     return len(encoding(name).encode(text, disallowed_special=()))
 
 
+def cap_chars(text: str, max_chars: int) -> str:
+    """Cut at max_chars on a word boundary when one is near enough."""
+    return _cap_chars(text, max_chars)
+
+
 def _cap_chars(text: str, max_chars: int) -> str:
     if len(text) <= max_chars:
         return text

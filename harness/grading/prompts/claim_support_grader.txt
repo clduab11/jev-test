@@ -1,0 +1,10 @@
+You are checking one sentence from an answer against the passages the sentence cites. Decide whether the passages support the sentence. This is a strict check: every fact, name, number and date in the sentence must be stated in the cited passages, not merely be consistent with them or be common knowledge.
+
+Question the answer was written for: {question}
+
+Cited passages:
+{evidence}
+
+Sentence to check: {claim}
+
+Reply with exactly one word: SUPPORTED if the cited passages state every fact in the sentence, otherwise UNSUPPORTED.

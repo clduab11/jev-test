@@ -23,9 +23,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Mapping, Protocol, Union
+from typing import Any, Protocol, Union
 
 JSONValue = Union[str, int, float, bool, None, dict, list]
 
@@ -112,6 +113,40 @@ def parse_answers(payload: Mapping[str, Any]) -> dict[str, Answer]:
         else:
             raise ValueError(f"unknown answer type {t!r} for question {qid!r}")
     return out
+
+
+def to_plain(answers: Mapping[str, Answer]) -> dict[str, dict[str, Any]]:
+    """Answers as JSON-ready dicts with a ``type`` field, for result files."""
+    out: dict[str, dict[str, Any]] = {}
+    for qid, answer in answers.items():
+        if isinstance(answer, NoulAnswer):
+            out[qid] = {"type": "noul", "noul": answer.noul}
+        elif isinstance(answer, ChoiceAnswer):
+            out[qid] = {
+                "type": "choice",
+                "choice": answer.choice,
+                "confidence": answer.confidence,
+                "probabilities": dict(answer.probabilities),
+            }
+        else:
+            out[qid] = {
+                "type": "score",
+                "score": answer.score,
+                "confidence": answer.confidence,
+                "probabilities": dict(answer.probabilities),
+                "legend": dict(answer.legend),
+            }
+    return out
+
+
+def run_many(
+    judge: Judge, items: Sequence[tuple[JSONValue, Mapping[str, Question]]]
+) -> list[SystemOneResponse]:
+    """Send several (state, questions) pairs, through the judge's pool when it has one."""
+    many = getattr(judge, "system_one_many", None)
+    if callable(many):
+        return list(many(list(items)))
+    return [judge.system_one(state, questions) for state, questions in items]
 
 
 # --------------------------------------------------------------------------- #
