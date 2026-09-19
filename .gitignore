@@ -34,3 +34,7 @@ Thumbs.db
 .idea/
 .vscode/
 .zed/
+
+# unattended run logs
+results/*.log
+results/*.stdout

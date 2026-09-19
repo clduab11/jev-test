@@ -35,7 +35,9 @@ The small model touches the process in two places: step 6 (one alternative searc
 
 ## The same flow as a picture
 
-Blue boxes are decisions Jev makes. Brown boxes are the only places the small model writes. Green cylinders are MemPalace. Grey is retrieval. The same diagram is saved as `docs/assets/pipeline.png` and `docs/assets/pipeline.svg` for reuse in posts, and the prompt used to draw it is in `docs/assets/pipeline-prompt.md`.
+Blue boxes are decisions Jev makes. Brown boxes are the only places the small model writes. Green cylinders are MemPalace. Grey is retrieval. The drawn version below is `docs/assets/pipeline.png`, made from the prompt in `docs/assets/pipeline-prompt.md`; the Mermaid source after it is the ground truth.
+
+![The pipeline: Jev decides, Gemma writes, MemPalace remembers](docs/assets/pipeline.png)
 
 ```mermaid
 flowchart LR
@@ -126,15 +128,28 @@ We also wrote down where we expect it to fail: questions that need facts combine
 
 A second experiment runs the same questions twice. The second pass starts with the memory the first pass built. Two bars apply: the second pass must make at most half as many judge requests per question, and its error rate must not rise by more than two points.
 
-## Pilot results: 20 questions, a shape check and not a finding
+## What we found so far
 
-Twenty SimpleQA questions were drawn with a fixed seed, their search results and pages were frozen on 2026-09-19, and versions A, B and D were run on the frozen set. The grader is Claude Sonnet 5 through a local gateway, with the official SimpleQA grading prompt. Intervals are bootstrap 95 percent over questions. Twenty questions give wide intervals; the point of the pilot is to check that every stage does what the spec says and to measure cost.
+In one sentence: on a 20-question pilot, handing every decision to a decision model took a two-billion-parameter model from 12 right and 4 wrong to 15 right and 0 wrong, at 49 judge calls and under a fifth of a cent per question.
+
+Twenty SimpleQA questions were drawn with a fixed seed, their search results and pages were frozen on 2026-09-19, and versions A, B and D were run on the frozen set. The grader is Claude Sonnet 5 through a local gateway, with the official SimpleQA grading prompt. Intervals are bootstrap 95 percent over questions.
 
 | Version | Correct | Wrong | Declined | Main score [95% CI] | Wrong when attempting [95% CI] | Attempted [95% CI] |
 |---|---|---|---|---|---|---|
 | A, generator alone | 0 | 6 | 14 | -0.30 [-0.50, -0.10] | 1.00 [1.00, 1.00] | 0.30 [0.10, 0.50] |
 | B, naive search, top 8 pages | 12 | 4 | 4 | 0.40 [0.05, 0.75] | 0.25 [0.06, 0.47] | 0.80 [0.60, 0.95] |
 | D, Jev decides | 15 | 0 | 5 | 0.75 [0.55, 0.95] | 0.00 [0.00, 0.00] | 0.75 [0.55, 0.95] |
+
+Findings from the pilot, each one checkable in `results/`:
+
+1. With Jev deciding, the small model got 15 of 20 right and none wrong. The same model with the same search results and no judge got 12 right and 4 wrong. Without search it got none right.
+2. The judged version declined 5 questions and wrote down why each time: twice the evidence was not enough after a second search, once every sentence of the draft failed verification, and twice the verified answer was about a neighbouring question (a year for the wrong event; a description of an artwork instead of its title).
+3. Verification did real work. Of the 31 cited sentences the small model wrote, 9 were removed before shipping, six of them because the judge's confidence was below 0.80. An outside grader then checked the 22 that shipped and agreed with 20.
+4. The small model invented no citation ids when the judge chose the evidence. The unjudged version invented two on the same questions.
+5. The second search rescued one question. The first pass had judged the right page's snippet off topic; the new query surfaced that page's own text from the frozen set, and it went to the top of the ranking.
+6. Cost: 49 judge requests and about 42,000 judge tokens per question, 3.5 cents for the whole pilot at list price, five seconds per question on a laptop.
+7. Early, on two questions only: when the small model judged itself with the same questions (version C-self), it took four to eight minutes per question, returned probabilities of exactly 0 or 1, and shipped a wrong answer as supported with confidence 1.0. The full 20-question run of that version is queued.
+8. Practical: a home SearXNG loses most of its engines after a few dozen queries. Of the first 286 questions of the 500-question freeze, none got the thirty results the design assumes and 44 got none; only DuckDuckGo kept answering, with Startpage back later. The freeze now paces itself and re-searches short questions when engines return.
 
 Against the four bars, on this pilot only:
 
@@ -145,15 +160,11 @@ Against the four bars, on this pilot only:
 | Improvement in the main score over version B | at least 0.15 | 0.35 |
 | Share of kept sentences the grader also finds supported | at least 0.90 | 0.91 (20 of 22) |
 
-Fifteen attempts with no wrong answer is consistent with a true error rate as high as one in five. The full run on 500 questions is what will decide it.
-
-What the pilot cost: 979 Jev requests for 20 questions, 49 per question, about 42,000 input tokens per question, 3.5 cents in total. The spec budgeted 90 requests per question; the difference is that pages whose snippet was dropped are never fetched. Each question took about five seconds end to end on a laptop, two of them the writer's.
-
-What the five declines were: twice the judge said the evidence was not enough even after the second search, once every sentence of the draft was stripped, and twice the checked answer did not address the question that was asked (one gave a year for the wrong event). Zero fabricated citation ids appeared in version D, against two in version B. The second search rescued one question: the first pass had judged the right page's snippet off topic, and the new query surfaced the page's own text from the frozen set.
+What this does not show yet: twenty questions give wide intervals, and fifteen attempts with no wrong answer is consistent with a true error rate as high as one in five. The 500-question run is in progress. Its numbers replace these when it finishes, and they will carry the recall of the frozen search results alongside, because a snapshot with ten results per question cannot be compared with one that has thirty.
 
 ## What leaves your computer
 
-Version D sends to TypeSafe's servers: the question, one passage at a time (up to about 1,800 characters each), the chosen evidence block, and each sentence of the draft answer. When memory is consulted, that includes your own stored text. It does not send your identity, whole pages, or anything about your browsing. On the pilot that was about 50 requests per question.
+Version D sends to TypeSafe's servers: the question, one passage at a time (up to about 1,800 characters each), the chosen evidence block, and each sentence of the draft answer. When memory is consulted, that includes your own stored text. It does not send your identity, whole pages, or anything about your browsing. On the pilot that was about 50 requests per question. TypeSafe may keep what it receives, so treat anything sent to the judge as shared with them.
 
 Versions A, B, C-laya, C-classical, and C-self send nothing anywhere. Gemma, Laya, MemPalace, and a SearXNG on your own machine is a complete setup. The only outside calls are the ones SearXNG makes to public search engines.
 
@@ -169,9 +180,9 @@ Grading the benchmark sends questions, reference answers, evidence, and answers 
 | Versions A, B and D | run end to end on the 20-question pilot, see [CHANGELOG.md](CHANGELOG.md) |
 | The five decision stages, rank fusion, memory write-back | done, each proved with a fake judge |
 | Grading: SimpleQA, citation support, the four bars | done, prompts committed under `harness/grading/prompts/` |
-| 500-question SimpleQA snapshot | freezing, paced; after the first twenty questions the public search engines started refusing requests, so most questions so far hold ten results from one engine. Short questions will be re-searched once the engines recover; no headline comes from this snapshot before that. See [CHANGELOG.md](CHANGELOG.md). |
+| 500-question SimpleQA snapshot | freezing, paced, with a re-search pass and versions A, B and D queued behind it in an unattended run (`scripts/run_web_track.py`, log in `results/web_track.log`). At the last probe only DuckDuckGo and Startpage were answering. |
 | FreshQA loader | done; the sheet holds 155 fast-changing questions, so the track uses all of them |
-| Versions C-self, C-laya, C-classical, E | C-self has a judge client and a first two-question run; C-laya has a local server shim tested against a stand-in model, with Laya itself not yet installed; C-classical and E are next |
+| Versions C-self, C-laya, C-classical, E | C-self ran on two questions (one right, one wrong at confidence 1.0) and its full pilot is queued in the unattended run; C-laya has a local server shim tested against a stand-in model, with Laya itself not yet installed; C-classical and E are next |
 | Memory experiment (second pass) | the write-back runs; the second pass is next |
 | The Space | not started |
 
@@ -218,7 +229,7 @@ Build order, with what is done:
 2. Done. `retrieval/searxng.py` and `retrieval/snapshot.py`. Freeze the search results and fetched pages for the whole question set into a MemPalace wing named `evidence`. Everything after this replays offline.
 3. Done. Arms A and B.
 4. Done. Stages S0 through S4 and the fusion step, driven by `questions.v1.json`. Then arm D.
-5. In progress. Arms C-self, C-laya, and C-classical, by swapping the judge. The C-self client answers the questions through the local model; its first probabilities came back as exact zeros and ones, so the arm has not been run yet.
+5. In progress. Arms C-self, C-laya, and C-classical, by swapping the judge. C-self runs; on its first two questions the small model's probabilities were exact zeros and ones and it shipped a wrong answer as supported.
 6. Done. Grading with the frontier model, prompts committed.
 7. Half done. Stage M2 writes verified claims; the second-pass memory experiment has not run.
 8. Not started. The Space, reading from `results/`.
@@ -248,7 +259,11 @@ uv run python -m harness.run --arm D --dataset simpleqa --snapshot pilot-2026091
 uv run python -m harness.run --grade results/A_simpleqa_pilot-20260919.json results/B_simpleqa_pilot-20260919.json results/D_simpleqa_pilot-20260919.json
 ```
 
-The grade step prints the score table and, for version D, the four bars labelled with the snapshot, so a pilot always reads as a pilot.
+The grade step prints the score table and, for a judged version, the four bars labelled with the snapshot, so a pilot always reads as a pilot. To run the whole web track unattended (finish the freeze, re-search short questions when engines allow it, run A, B and D, grade):
+
+```bash
+uv run --with "system-one-adapter[openai]>=0.2.0" python scripts/run_web_track.py --snapshot simpleqa-500-20260919 --n 500 --cself-pilot
+```
 
 ## Sources
 

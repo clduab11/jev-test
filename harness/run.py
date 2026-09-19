@@ -3,20 +3,26 @@
     uv run python -m harness.run --arm A --dataset simpleqa --snapshot pilot-20260919
     uv run python -m harness.run --arm B --dataset simpleqa --snapshot pilot-20260919
     uv run python -m harness.run --arm D --dataset simpleqa --snapshot pilot-20260919 --limit 2
+    uv run python -m harness.run --arm D --dataset simpleqa --snapshot simpleqa-500-20260919 --resume
     uv run python -m harness.run --grade results/A_simpleqa_pilot-20260919.json results/B_simpleqa_pilot-20260919.json
 
 Results go to results/<arm>_<dataset>_<snapshot>.json with one record per
 question: query, gold, answer, abstained, claims, citations,
-fabricated_citations, latency, generator model, seed, and for arm D every
-stage's decisions plus judge request and token counts. ``--grade`` adds a
-``grade`` to every record and a ``metrics`` block to the file, then prints
-truthfulness, hallucination rate and coverage with bootstrap intervals. For
-arm D it also grades citation support and prints the four pre-registered
+fabricated_citations, latency, generator model, seed, and for the judged arms
+every stage's decisions plus judge request and token counts. ``--grade`` adds
+a ``grade`` to every record and a ``metrics`` block to the file, then prints
+truthfulness, hallucination rate and coverage with bootstrap intervals. For a
+judged arm it also grades citation support and prints the four pre-registered
 bars against arm B, labelled with the snapshot so a pilot reads as a pilot.
 
-Arm D writes verified claims to a memory palace of its own under palace/
-(git-ignored), one per snapshot and arm, wiped at the start of a pass-one run
-because the spec says pass one starts from an empty verified wing.
+``--resume`` continues an interrupted run from its results file: answered
+questions are kept, the rest are answered, and the file is checkpointed every
+ten questions. A judged arm keeps its memory palace on resume instead of
+wiping it.
+
+Arm D and C-self write verified claims to a memory palace of their own under
+palace/ (git-ignored), one per snapshot and arm, wiped at the start of a fresh
+pass-one run because the spec says pass one starts from an empty verified wing.
 """
 
 from __future__ import annotations
@@ -34,6 +40,7 @@ from harness.grading import crag_score
 
 ARMS = ("A", "B", "D", "C-self")
 JUDGED_ARMS = ("D", "C-self")
+CHECKPOINT_EVERY = 10
 
 
 def results_path(out_dir: Path, arm: str, dataset: str, snapshot: str) -> Path:
@@ -69,6 +76,62 @@ def build_judge(arm: str):
     raise ValueError(f"no judge wired for arm {arm!r}")
 
 
+def _payload(
+    arm: str,
+    dataset: str,
+    snapshot: str,
+    seed: int,
+    today: str,
+    records: list[dict[str, Any]],
+    judge,
+    memory_path: Path | None,
+    memory_palace,
+    complete: bool,
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "arm": arm,
+        "dataset": dataset,
+        "snapshot": snapshot,
+        "spec_version": spec_version(),
+        "generator_model": env("GENERATOR_MODEL"),
+        "generator_url": env("LLAMA_SERVER_URL"),
+        "seed": seed,
+        "thinking": False,
+        "today": today,
+        "n": len(records),
+        "complete": complete,
+        "created_at": _now(),
+    }
+    if judge is not None:
+        totals = {"n_requests": 0, "n_cached": 0, "input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0}
+        for record in records:
+            for key in totals:
+                totals[key] += (record.get("judge") or {}).get(key, 0)
+        totals["cost_usd"] = round(totals["cost_usd"], 6)
+        totals["per_query_requests"] = round(totals["n_requests"] / len(records), 1) if records else None
+        payload["judge"] = {
+            "model": next((r.get("s0", {}).get("model") for r in records if r.get("s0")), judge.model),
+            "requested_model": judge.model,
+            "base_url": env("JEV_BASE_URL") if arm == "D" else env("LLAMA_SERVER_URL"),
+            **totals,
+        }
+        if getattr(judge, "failures", 0):
+            payload["judge"]["fallback_answers"] = int(judge.failures)
+        payload["memory_palace"] = {
+            "path": str(memory_path),
+            "drawers": memory_palace.count() if memory_palace else 0,
+        }
+    payload["records"] = records
+    return payload
+
+
+def _write(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
+    tmp.replace(path)
+
+
 def run_arm(
     arm: str,
     dataset: str,
@@ -78,6 +141,7 @@ def run_arm(
     seed: int,
     memory_palace_path: Path | None = None,
     keep_memory: bool = False,
+    resume: bool = False,
     log=print,
 ) -> Path:
     from harness.retrieval.snapshot import load_manifest, open_palace, palace_path, replay
@@ -87,6 +151,14 @@ def run_arm(
     rows = _load_rows(dataset, question_ids)
     palace = open_palace(palace_path(snapshot), read_only=True) if arm != "A" else None
     today = str(manifest.get("created_at", ""))[:10] or time.strftime("%Y-%m-%d", time.gmtime())
+    path = results_path(out_dir, arm, dataset, snapshot)
+
+    done: dict[str, dict[str, Any]] = {}
+    if resume and path.exists():
+        prior = json.loads(path.read_text(encoding="utf-8"))
+        wanted = set(question_ids)
+        done = {r["question_id"]: r for r in prior.get("records", []) if r.get("question_id") in wanted}
+        log(f"resuming {path.name}: {len(done)} of {len(question_ids)} questions already answered")
 
     judge = None
     memory_palace = None
@@ -94,7 +166,7 @@ def run_arm(
     if arm in JUDGED_ARMS:
         judge = build_judge(arm)
         memory_path = memory_palace_path or default_memory_palace(snapshot, arm)
-        if memory_path.exists() and not keep_memory and memory_palace_path is None:
+        if memory_path.exists() and not keep_memory and memory_palace_path is None and not done:
             shutil.rmtree(memory_path)
             log(f"memory palace {memory_path} wiped: pass one starts from an empty verified wing")
         memory_palace = open_palace(memory_path)
@@ -102,7 +174,11 @@ def run_arm(
         log(f"judge {judge.model} at {judge_url}; memory palace {memory_path} ({memory_palace.count()} drawers)")
 
     records: list[dict[str, Any]] = []
+    answered_now = 0
     for index, qid in enumerate(question_ids, 1):
+        if qid in done:
+            records.append(done[qid])
+            continue
         row = rows[qid]
         started = time.perf_counter()
         if arm == "A":
@@ -134,6 +210,7 @@ def run_arm(
         record = {"question_id": qid, "query": row["query"], "gold": row["gold"], **record}
         record["wall_s"] = round(time.perf_counter() - started, 3)
         records.append(record)
+        answered_now += 1
         preview = "ABSTAIN" if record["abstained"] else (record["answer"][:90] + ("..." if len(record["answer"]) > 90 else ""))
         extra = ""
         if record.get("judge"):
@@ -142,48 +219,20 @@ def run_arm(
         if record.get("abstained") and record.get("abstain_reason"):
             preview += f" ({record['abstain_reason']})"
         log(f"[{index}/{len(question_ids)}] {qid} ({record['wall_s']:.1f}s{extra}): {preview}")
+        if answered_now % CHECKPOINT_EVERY == 0:
+            _write(path, _payload(arm, dataset, snapshot, seed, today, records, judge, memory_path, memory_palace, complete=False))
 
-    payload: dict[str, Any] = {
-        "arm": arm,
-        "dataset": dataset,
-        "snapshot": snapshot,
-        "spec_version": spec_version(),
-        "generator_model": env("GENERATOR_MODEL"),
-        "generator_url": env("LLAMA_SERVER_URL"),
-        "seed": seed,
-        "thinking": False,
-        "today": today,
-        "n": len(records),
-        "created_at": _now(),
-    }
-    if judge is not None:
-        totals = {"n_requests": 0, "n_cached": 0, "input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0}
-        for record in records:
-            for key in totals:
-                totals[key] += (record.get("judge") or {}).get(key, 0)
-        totals["cost_usd"] = round(totals["cost_usd"], 6)
-        totals["per_query_requests"] = round(totals["n_requests"] / len(records), 1) if records else None
-        payload["judge"] = {
-            "model": next((r.get("s0", {}).get("model") for r in records if r.get("s0")), judge.model),
-            "requested_model": judge.model,
-            "base_url": env("JEV_BASE_URL") if arm == "D" else env("LLAMA_SERVER_URL"),
-            **totals,
-        }
-        payload["memory_palace"] = {"path": str(memory_path), "drawers": memory_palace.count() if memory_palace else 0}
-        if getattr(judge, "failures", 0):
-            payload["judge"]["fallback_answers"] = int(judge.failures)
-            log(f"judge failed to answer {judge.failures} request(s); those got the do-not-know fallback")
-    payload["records"] = records
-    out_dir.mkdir(parents=True, exist_ok=True)
-    path = results_path(out_dir, arm, dataset, snapshot)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
-    log(f"wrote {path} ({len(records)} records)")
+    payload = _payload(arm, dataset, snapshot, seed, today, records, judge, memory_path, memory_palace, complete=True)
+    _write(path, payload)
+    log(f"wrote {path} ({len(records)} records, {answered_now} answered in this run)")
     if judge is not None:
         j = payload["judge"]
         log(
             f"judge totals: {j['n_requests']} requests ({j['n_cached']} cached), "
             f"{j['input_tokens']} input tokens, ${j['cost_usd']:.4f}, {j['per_query_requests']} requests per query"
         )
+        if getattr(judge, "failures", 0):
+            log(f"judge failed to answer {judge.failures} request(s); those got the do-not-know fallback")
     return path
 
 
@@ -209,7 +258,7 @@ def grade_file(path: Path, model: str | None = None, log=print) -> dict[str, Any
             record["claim_support"] = claim_grades
         metrics["claim_support"] = claim_support.support_rate([[g["label"] for g in cg] for cg in per_record])
     payload["metrics"] = metrics
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
+    _write(path, payload)
     log(f"graded {path.name}: {metrics['correct']} correct, {metrics['incorrect']} incorrect, {metrics['not_attempted']} not attempted (grader {metrics['grader_model']})")
     if "claim_support" in metrics:
         cs = metrics["claim_support"]
@@ -218,7 +267,7 @@ def grade_file(path: Path, model: str | None = None, log=print) -> dict[str, Any
 
 
 def print_bars(payload: dict[str, Any], out_dir: Path, log=print) -> None:
-    """Arm D against the four pre-registered bars, using arm B on the same snapshot."""
+    """A judged arm against the four pre-registered bars, using arm B on the same snapshot."""
     from harness.grading import prereg
 
     b_path = results_path(out_dir, "B", payload["dataset"], payload["snapshot"])
@@ -241,8 +290,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", default="results")
     parser.add_argument("--limit", type=int, default=None, help="only the first N questions")
     parser.add_argument("--seed", type=int, default=None, help="generator seed; default GENERATOR_SEED from .env")
-    parser.add_argument("--memory-palace", default=None, help="arm D: palace directory for verified claims (default palace/<snapshot>_<arm>_pass1, wiped first)")
-    parser.add_argument("--keep-memory", action="store_true", help="arm D: do not wipe the default memory palace first")
+    parser.add_argument("--resume", action="store_true", help="continue from the existing results file")
+    parser.add_argument("--memory-palace", default=None, help="judged arms: palace directory for verified claims (default palace/<snapshot>_<arm>_pass1, wiped first)")
+    parser.add_argument("--keep-memory", action="store_true", help="judged arms: do not wipe the default memory palace first")
     parser.add_argument("--grade", nargs="*", metavar="RESULTS_JSON", help="grade these results files (or the file this run would write)")
     parser.add_argument("--grader-model", default=None)
     args = parser.parse_args(argv)
@@ -265,6 +315,7 @@ def main(argv: list[str] | None = None) -> int:
             seed,
             memory_palace_path=Path(args.memory_palace) if args.memory_palace else None,
             keep_memory=args.keep_memory,
+            resume=args.resume,
         )
 
     if args.grade is not None:

@@ -1,0 +1,1164 @@
+{
+ "arm": "C-self",
+ "dataset": "simpleqa",
+ "snapshot": "pilot-20260919",
+ "spec_version": "v1",
+ "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
+ "generator_url": "http://127.0.0.1:8888/v1",
+ "seed": 20260919,
+ "thinking": false,
+ "today": "2026-09-19",
+ "n": 2,
+ "created_at": "2026-09-19T19:24:16Z",
+ "judge": {
+  "model": "self:unsloth/gemma-4-E2B-it-qat-GGUF:probabilities",
+  "requested_model": "self:unsloth/gemma-4-E2B-it-qat-GGUF:probabilities",
+  "base_url": "http://127.0.0.1:8888/v1",
+  "n_requests": 120,
+  "n_cached": 0,
+  "input_tokens": 51111,
+  "output_tokens": 12866,
+  "cost_usd": 0.002147,
+  "per_query_requests": 60.0,
+  "fallback_answers": 1
+ },
+ "memory_palace": {
+  "path": "C:\\Users\\cld-main\\Desktop\\github-projects\\jev-test\\palace\\pilot-20260919_C-self_pass1",
+  "drawers": 3
+ },
+ "records": [
+  {
+   "question_id": "simpleqa-0031",
+   "query": "In 1810, François Aimé Louis Dumoulin published a collection of how many engravings themed on the journey of \"Robinson Crusoe\"?",
+   "gold": "150",
+   "arm": "C-self",
+   "s0": {
+    "retrieve": true,
+    "retrieve_judged": true,
+    "source": "web",
+    "source_judged": "web",
+    "time_range": null,
+    "category": "general",
+    "forced": {
+     "search": true,
+     "web": true
+    },
+    "since": null,
+    "answers": {
+     "needs_search": {
+      "type": "noul",
+      "noul": 1.0
+     },
+     "source": {
+      "type": "choice",
+      "choice": "web",
+      "confidence": 1.0,
+      "probabilities": {
+       "web": 1.0,
+       "palace": 0.0,
+       "both": 0.0
+      }
+     },
+     "recency": {
+      "type": "choice",
+      "choice": "any",
+      "confidence": 0.0,
+      "probabilities": {
+       "any": 1.0,
+       "year": 1.0,
+       "month": 1.0,
+       "week": 1.0,
+       "day": 1.0
+      }
+     },
+     "category": {
+      "type": "choice",
+      "choice": "general",
+      "confidence": 1.0,
+      "probabilities": {
+       "general": 1.0,
+       "news": 0.0,
+       "science": 0.0,
+       "it": 0.0
+      }
+     }
+    },
+    "model": "self:unsloth/gemma-4-E2B-it-qat-GGUF:probabilities",
+    "cached": false,
+    "n_requests": 1,
+    "n_cached": 0,
+    "input_tokens": 203,
+    "output_tokens": 164
+   },
+   "today": "2026-09-19",
+   "seed": 20260919,
+   "searched": true,
+   "s1": {
+    "snippets": {
+     "n": 30,
+     "reasons": {
+      "evidence": 15,
+      "nothing_usable": 1,
+      "off_topic": 12,
+      "contradicts_premise": 1,
+      "boilerplate": 1
+     },
+     "survivors": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      9,
+      10,
+      13,
+      14,
+      15,
+      16,
+      20,
+      22,
+      24
+     ],
+     "fetched": [
+      1,
+      2,
+      3,
+      4,
+      5
+     ],
+     "not_fetched": [
+      6,
+      8,
+      9,
+      10,
+      13,
+      14,
+      15,
+      16,
+      20,
+      22,
+      24
+     ],
+     "fallback_snippets": [
+      "r04s"
+     ]
+    },
+    "chunks": {
+     "n": 20,
+     "reasons": {
+      "evidence": 6,
+      "off_topic": 13,
+      "contradicts_premise": 1
+     },
+     "dropped": [
+      {
+       "id": "r01c2",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r03c0",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r03c1",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r03c3",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r03c5",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r03c6",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r03c7",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r05c0",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r05c1",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r05c4",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r05c5",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r05c6",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r05c7",
+       "reason": "off_topic"
+      }
+     ]
+    }
+   },
+   "s2": [
+    {
+     "action": "generate",
+     "round": 0,
+     "sufficient": true,
+     "sufficient_p": 1.0,
+     "conflicts": false,
+     "conflicts_p": 0.0,
+     "evidence_ids": [
+      "r01c0",
+      "r01c1",
+      "r02c0",
+      "r03c2",
+      "r03c4",
+      "r04s"
+     ],
+     "answers": {
+      "evidence_sufficient": {
+       "type": "noul",
+       "noul": 1.0
+      },
+      "evidence_conflicts": {
+       "type": "noul",
+       "noul": 0.0
+      }
+     },
+     "model": "self:unsloth/gemma-4-E2B-it-qat-GGUF:probabilities",
+     "cached": false,
+     "n_requests": 1,
+     "n_cached": 0,
+     "input_tokens": 1878,
+     "output_tokens": 50
+    }
+   ],
+   "refine": null,
+   "evidence": [
+    {
+     "id": "r01c0",
+     "drawer_id": "ev_3af85719dcbbdefa_c0",
+     "kind": "chunk",
+     "lane": "web",
+     "domain": "en.wikipedia.org",
+     "source_type": "encyclopedia",
+     "engine_rank": 1,
+     "similarity": null,
+     "n_tokens": 300,
+     "rrf_score": 0.03278688524590164,
+     "gate": {
+      "is_relevant": 1.0,
+      "contains_answer_evidence": 1.0,
+      "contradicts_query_premise": 0.0,
+      "contains_prompt_injection": 0.0,
+      "is_promotional_or_boilerplate": 0.0
+     },
+     "text": "| François Aimé Louis Dumoulin | |\n|---|---|\n| Born | 10 August 1753 |\n| Died | 16 February 1834 (aged 80) |\n| Education | Autodidact |\nFrançois Aimé Louis Dumoulin (French pronunciation: [fʁɑ̃swa eme lwi dymulɛ̃]; 10 August 1753 – 16 February 1834) was a Swiss painter and engraver.\nAlthough he received some education in technical drawing, Dumoulin was initially intended for a commercial career. In 1772, he sailed to England and to America the next year. Arriving in Grenada, he made business while drawing plans and views for the governor.\nFrom 1776 to 1782, Dumoulin was a witness to the American War of Independence, drawing several naval battles between the French Navy and the British Royal Navy.\nReturned to Vevey in 1783, he turned his sketches of the battles into oil paintings and watercolours, earning his life diving drawing lessons.\nBetween 1795 and 1797, Dumoulin was in Paris, where he took lessons in anatomy, copied ancient paintings in the Louvre, attended the Academy and the School of naval constructions. Two of his paintings of naval battles were exposed at the 1796 Salon.\nBack to Vevey in 1797, he opened a class in technical drawing.\nIn"
+    },
+    {
+     "id": "r01c1",
+     "drawer_id": "ev_37b1ce0de2f11c34_c1",
+     "kind": "chunk",
+     "lane": "web",
+     "domain": "en.wikipedia.org",
+     "source_type": "encyclopedia",
+     "engine_rank": 1,
+     "similarity": null,
+     "n_tokens": 300,
+     "rrf_score": 0.03278688524590164,
+     "gate": {
+      "is_relevant": 1.0,
+      "contains_answer_evidence": 1.0,
+      "contradicts_query_premise": 0.0,
+      "contains_prompt_injection": 0.0,
+      "is_promotional_or_boilerplate": 0.0
+     },
+     "text": ", attended the Academy and the School of naval constructions. Two of his paintings of naval battles were exposed at the 1796 Salon.\nBack to Vevey in 1797, he opened a class in technical drawing.\nIn 1810, Dumoulin published a collection of 150 engravings themed on the journey of Robinson Crusoe, which is considered to be a precursor to modern comics.[1]\n- Carl Brun, Schweizerisches Künstler-Lexikon, Frauenfeld, 1905–1917, p. 397.\n- Paul Morand, Monsieur Dumoulin à l’Isle de la Grenade, Paudex, 1976 [biographie fictive et littéraire avec des reproductions en couleur des œuvres du Musée historique de Vevey].\n- Françoise Bonnet Borel, «Dumoulin, peintre veveysan», dans Vibiscum, 2, 1991, p. 59-97.\n- Annie Renonciat, « Le Robinson de Dumoulin : un roman en 150 estampes (ca 1810) », dans 9e Art, Les Cahiers du musée de la bande dessinée, Angoulême, n° 8, janvier 2003, p. 10-19.\n- Thierry Smolderen, « Ceci n’est pas une bulle ! - Structures é"
+    },
+    {
+     "id": "r02c0",
+     "drawer_id": "ev_0825bccd91839460_c0",
+     "kind": "chunk",
+     "lane": "web",
+     "domain": "wikiwand.com",
+     "source_type": "encyclopedia",
+     "engine_rank": 2,
+     "similarity": null,
+     "n_tokens": 234,
+     "rrf_score": 0.032266458495966696,
+     "gate": {
+      "is_relevant": 1.0,
+      "contains_answer_evidence": 1.0,
+      "contradicts_query_premise": 0.0,
+      "contains_prompt_injection": 0.0,
+      "is_promotional_or_boilerplate": 0.0
+     },
+     "text": "Although he received some education in technical drawing, Dumoulin was initially intended for a commercial career. In 1772, he sailed to England and to America the next year. Arriving in Grenada, he made business while drawing plans and views for the governor.\nFrom 1776 to 1782, Dumoulin was a witness to the American War of Independence, drawing several naval battles between the French Navy and the British Royal Navy.\nReturned to Vevey in 1783, he turned his sketches of the battles into oil paintings and watercolours, earning his life diving drawing lessons.\nBetween 1795 and 1797, Dumoulin was in Paris, where he took lessons in anatomy, copied ancient paintings in the Louvre, attended the Academy and the School of naval constructions. Two of his paintings of naval battles were exposed at the 1796 Salon.\nBack to Vevey in 1797, he opened a class in technical drawing.\nIn 1810, Dumoulin published a collection of 150 engravings themed on the journey of Robinson Crusoe, which is considered to be a precursor to modern comics.[1]"
+    },
+    {
+     "id": "r03c2",
+     "drawer_id": "ev_88fe92d022454637_c2",
+     "kind": "chunk",
+     "lane": "web",
+     "domain": "onlinebooks.library.upenn.edu",
+     "source_type": "unknown",
+     "engine_rank": 3,
+     "similarity": null,
+     "n_tokens": 300,
+     "rrf_score": 0.032018442622950824,
+     "gate": {
+      "is_relevant": 1.0,
+      "contains_answer_evidence": 1.0,
+      "contradicts_query_premise": 0.0,
+      "contains_prompt_injection": 0.0,
+      "is_promotional_or_boilerplate": 0.0
+     },
+     "text": "(page images at HathiTrust)\n- Defoe, Daniel, 1661?-1731: Bywyd ac Anturiaethau Rhyfeddol Robinson Crusoe: Yr Hwn A Fu Byw Wyth Mlynedd Ar Hugain Mewn Ynys Anghyfanedd, Wedi Ei Fwrw Yno Pan Dorodd Y Llong Arno. Hefyd, Ei Ail-ymweliad A'r Ynys Hono, A'i Deithiau Peryglus Mewn Amryw Barthau Ereill O'r Byd (Robinson Crusue translated into Welsh; Caernarfon: H. Humphreys, n.d.) (page images at HathiTrust; US access only)\n- Defoe, Daniel, 1661?-1731: Collection de Cent-Cinquante Gravures Représentant et Formant une Suite Non-Interrompue des Voyages et Aventures Surprenantes de Robinson Crusoé (150 illustrations with French captions retelling the story of Robinson Crusoe; Vevey: Loertscher et fils, n.d.), illust. by F. A. L. Dumoulin (Gutenberg text and illustrated HTML)\n- Defoe, Daniel, 1661?-1731: The Complete English Tradesman (based on the 1839 Edinburgh edition) (Gutenberg text)\n- Defoe"
+    },
+    {
+     "id": "r03c4",
+     "drawer_id": "ev_a6674711e8cea38f_c4",
+     "kind": "chunk",
+     "lane": "web",
+     "domain": "onlinebooks.library.upenn.edu",
+     "source_type": "unknown",
+     "engine_rank": 3,
+     "similarity": null,
+     "n_tokens": 300,
+     "rrf_score": 0.032018442622950824,
+     "gate": {
+      "is_relevant": 1.0,
+      "contains_answer_evidence": 1.0,
+      "contradicts_query_premise": 0.0,
+      "contains_prompt_injection": 0.0,
+      "is_promotional_or_boilerplate": 0.0
+     },
+     "text": "1?-1731: An Essay Upon Projects (Gutenberg text and illustrated HTML)\n- Defoe, Daniel, 1661?-1731: Everybody's Business is Nobody's Business (Gutenberg text)\n- Defoe, Daniel, 1661?-1731: The Farther Adventures of Robinson Crusoe; Being The Second and Last Part of His Life, and of The Strange Surprizing Account of His Travels Round Three Parts of The Globe; Written by Himself (third edition; London: Printed for W. Taylor, 1722)\n- Defoe, Daniel, 1661?-1731: The Fortunate Mistress: or, A History of the Life of Mademoiselle de Beleau, Known by the Name of the Lady Roxana (from a \"Works of Daniel Defoe\" set, with a posthumously published continuation, and an introduction by Maynadier; New York: G. D. Sproul, 1908), contrib. by Howard Maynadier (Gutenberg text and illustrated HTML)\n- Defoe, Daniel, 1661?-1731: The Fortunes and Misfortunes of the Famous Moll Flanders (multiple editions)\n- Defoe, Daniel, 1661?-1731: The Fortunes and Misfortunes of the Famous Moll Flanders (Gutenberg text and audio)\n- Defoe, Daniel, 1661?-1731, contrib.: Fourteen Papers (London:"
+    },
+    {
+     "id": "r04s",
+     "drawer_id": null,
+     "kind": "snippet",
+     "lane": "web",
+     "domain": "wiki2.org",
+     "source_type": "encyclopedia",
+     "engine_rank": 4,
+     "similarity": null,
+     "n_tokens": 87,
+     "rrf_score": 0.031544957774465976,
+     "gate": {
+      "is_relevant": 1.0,
+      "contains_answer_evidence": 1.0,
+      "contradicts_query_premise": 0.0,
+      "contains_prompt_injection": 0.0,
+      "is_promotional_or_boilerplate": 0.0
+     },
+     "text": "La Tempête, one of the 150 drawings on Robinson Crusoe In 1810, Dumoulin published a collection of 150 engravings themed on the journey of Robinson Crusoe, which is considered to be a precursor to modern comics. [1] Sources and references Bibliography Carl Brun, Schweizerisches Künstler-Lexikon, Frauenfeld, 1905-1917, p. 397."
+    }
+   ],
+   "evidence_ids": [
+    "r01c0",
+    "r01c1",
+    "r02c0",
+    "r03c2",
+    "r03c4",
+    "r04s",
+    "r05c3"
+   ],
+   "evidence_texts": {
+    "r01c0": "| François Aimé Louis Dumoulin | |\n|---|---|\n| Born | 10 August 1753 |\n| Died | 16 February 1834 (aged 80) |\n| Education | Autodidact |\nFrançois Aimé Louis Dumoulin (French pronunciation: [fʁɑ̃swa eme lwi dymulɛ̃]; 10 August 1753 – 16 February 1834) was a Swiss painter and engraver.\nAlthough he received some education in technical drawing, Dumoulin was initially intended for a commercial career. In 1772, he sailed to England and to America the next year. Arriving in Grenada, he made business while drawing plans and views for the governor.\nFrom 1776 to 1782, Dumoulin was a witness to the American War of Independence, drawing several naval battles between the French Navy and the British Royal Navy.\nReturned to Vevey in 1783, he turned his sketches of the battles into oil paintings and watercolours, earning his life diving drawing lessons.\nBetween 1795 and 1797, Dumoulin was in Paris, where he took lessons in anatomy, copied ancient paintings in the Louvre, attended the Academy and the School of naval constructions. Two of his paintings of naval battles were exposed at the 1796 Salon.\nBack to Vevey in 1797, he opened a class in technical drawing.\nIn",
+    "r01c1": ", attended the Academy and the School of naval constructions. Two of his paintings of naval battles were exposed at the 1796 Salon.\nBack to Vevey in 1797, he opened a class in technical drawing.\nIn 1810, Dumoulin published a collection of 150 engravings themed on the journey of Robinson Crusoe, which is considered to be a precursor to modern comics.[1]\n- Carl Brun, Schweizerisches Künstler-Lexikon, Frauenfeld, 1905–1917, p. 397.\n- Paul Morand, Monsieur Dumoulin à l’Isle de la Grenade, Paudex, 1976 [biographie fictive et littéraire avec des reproductions en couleur des œuvres du Musée historique de Vevey].\n- Françoise Bonnet Borel, «Dumoulin, peintre veveysan», dans Vibiscum, 2, 1991, p. 59-97.\n- Annie Renonciat, « Le Robinson de Dumoulin : un roman en 150 estampes (ca 1810) », dans 9e Art, Les Cahiers du musée de la bande dessinée, Angoulême, n° 8, janvier 2003, p. 10-19.\n- Thierry Smolderen, « Ceci n’est pas une bulle ! - Structures é",
+    "r02c0": "Although he received some education in technical drawing, Dumoulin was initially intended for a commercial career. In 1772, he sailed to England and to America the next year. Arriving in Grenada, he made business while drawing plans and views for the governor.\nFrom 1776 to 1782, Dumoulin was a witness to the American War of Independence, drawing several naval battles between the French Navy and the British Royal Navy.\nReturned to Vevey in 1783, he turned his sketches of the battles into oil paintings and watercolours, earning his life diving drawing lessons.\nBetween 1795 and 1797, Dumoulin was in Paris, where he took lessons in anatomy, copied ancient paintings in the Louvre, attended the Academy and the School of naval constructions. Two of his paintings of naval battles were exposed at the 1796 Salon.\nBack to Vevey in 1797, he opened a class in technical drawing.\nIn 1810, Dumoulin published a collection of 150 engravings themed on the journey of Robinson Crusoe, which is considered to be a precursor to modern comics.[1]",
+    "r03c2": "(page images at HathiTrust)\n- Defoe, Daniel, 1661?-1731: Bywyd ac Anturiaethau Rhyfeddol Robinson Crusoe: Yr Hwn A Fu Byw Wyth Mlynedd Ar Hugain Mewn Ynys Anghyfanedd, Wedi Ei Fwrw Yno Pan Dorodd Y Llong Arno. Hefyd, Ei Ail-ymweliad A'r Ynys Hono, A'i Deithiau Peryglus Mewn Amryw Barthau Ereill O'r Byd (Robinson Crusue translated into Welsh; Caernarfon: H. Humphreys, n.d.) (page images at HathiTrust; US access only)\n- Defoe, Daniel, 1661?-1731: Collection de Cent-Cinquante Gravures Représentant et Formant une Suite Non-Interrompue des Voyages et Aventures Surprenantes de Robinson Crusoé (150 illustrations with French captions retelling the story of Robinson Crusoe; Vevey: Loertscher et fils, n.d.), illust. by F. A. L. Dumoulin (Gutenberg text and illustrated HTML)\n- Defoe, Daniel, 1661?-1731: The Complete English Tradesman (based on the 1839 Edinburgh edition) (Gutenberg text)\n- Defoe",
+    "r03c4": "1?-1731: An Essay Upon Projects (Gutenberg text and illustrated HTML)\n- Defoe, Daniel, 1661?-1731: Everybody's Business is Nobody's Business (Gutenberg text)\n- Defoe, Daniel, 1661?-1731: The Farther Adventures of Robinson Crusoe; Being The Second and Last Part of His Life, and of The Strange Surprizing Account of His Travels Round Three Parts of The Globe; Written by Himself (third edition; London: Printed for W. Taylor, 1722)\n- Defoe, Daniel, 1661?-1731: The Fortunate Mistress: or, A History of the Life of Mademoiselle de Beleau, Known by the Name of the Lady Roxana (from a \"Works of Daniel Defoe\" set, with a posthumously published continuation, and an introduction by Maynadier; New York: G. D. Sproul, 1908), contrib. by Howard Maynadier (Gutenberg text and illustrated HTML)\n- Defoe, Daniel, 1661?-1731: The Fortunes and Misfortunes of the Famous Moll Flanders (multiple editions)\n- Defoe, Daniel, 1661?-1731: The Fortunes and Misfortunes of the Famous Moll Flanders (Gutenberg text and audio)\n- Defoe, Daniel, 1661?-1731, contrib.: Fourteen Papers (London:",
+    "r04s": "La Tempête, one of the 150 drawings on Robinson Crusoe In 1810, Dumoulin published a collection of 150 engravings themed on the journey of Robinson Crusoe, which is considered to be a precursor to modern comics. [1] Sources and references Bibliography Carl Brun, Schweizerisches Künstler-Lexikon, Frauenfeld, 1905-1917, p. 397.",
+    "r05c3": "lin (Gutenberg text and illustrated HTML)\n- Defoe, Daniel, 1661?-1731: The Complete English Tradesman (based on the 1839 Edinburgh edition) (Gutenberg text)\n- Defoe, Daniel, 1661?-1731: The Consolidator: or, Memoirs of Sundry Transactions from the World in the Moon (Gutenberg text)\n- Defoe, Daniel, 1661?-1731: Dickory Cronke: The Dumb Philosopher: or, Great Britain's Wonder (Gutenberg text)\n- Defoe, Daniel, 1661?-1731: The Dreadful Visitation in a Short Account of the Progress and Effects of the Plague, the Last Time it Spread in the City of London in the Year 1665 Extracted From the Memoirs of a Person Who Resided There During the Whole Time of That Infection (abridged from Defoe's Journal of the Plague Year; Germantown, PA: Printed by C. Sower, 1763)\n- Defoe, Daniel, 1661?-1731: An Essay on the Regulation of the Press (1704) (HTML at Renascence Editions)\n- Defoe, Daniel, 1661?-1731: An Essay Upon Projects (Gutenberg text and illustrated HTML)\n- Defoe, Daniel, 1661?-1731: Everybody's Business is Nobody's Business (Gutenberg text)\n- Defoe"
+   },
+   "conflicts_block": [
+    {
+     "id": "r05c3",
+     "drawer_id": "ev_d098e35917fdfe34_c3",
+     "kind": "chunk",
+     "lane": "web",
+     "domain": "onlinebooks.library.upenn.edu",
+     "source_type": "unknown",
+     "engine_rank": 5,
+     "similarity": null,
+     "n_tokens": 300,
+     "rrf_score": null,
+     "gate": {
+      "is_relevant": 1.0,
+      "contains_answer_evidence": 1.0,
+      "contradicts_query_premise": 1.0,
+      "contains_prompt_injection": 0.0,
+      "is_promotional_or_boilerplate": 0.0
+     },
+     "text": "lin (Gutenberg text and illustrated HTML)\n- Defoe, Daniel, 1661?-1731: The Complete English Tradesman (based on the 1839 Edinburgh edition) (Gutenberg text)\n- Defoe, Daniel, 1661?-1731: The Consolidator: or, Memoirs of Sundry Transactions from the World in the Moon (Gutenberg text)\n- Defoe, Daniel, 1661?-1731: Dickory Cronke: The Dumb Philosopher: or, Great Britain's Wonder (Gutenberg text)\n- Defoe, Daniel, 1661?-1731: The Dreadful Visitation in a Short Account of the Progress and Effects of the Plague, the Last Time it Spread in the City of London in the Year 1665 Extracted From the Memoirs of a Person Who Resided There During the Whole Time of That Infection (abridged from Defoe's Journal of the Plague Year; Germantown, PA: Printed by C. Sower, 1763)\n- Defoe, Daniel, 1661?-1731: An Essay on the Regulation of the Press (1704) (HTML at Renascence Editions)\n- Defoe, Daniel, 1661?-1731: An Essay Upon Projects (Gutenberg text and illustrated HTML)\n- Defoe, Daniel, 1661?-1731: Everybody's Business is Nobody's Business (Gutenberg text)\n- Defoe"
+    }
+   ],
+   "fusion": {
+    "retriever": {
+     "r01c0": 1,
+     "r01c1": 1,
+     "r02c0": 3,
+     "r03c2": 4,
+     "r03c4": 4,
+     "r05c2": 7,
+     "r04s": 6
+    },
+    "palace": {},
+    "evidence": {
+     "r01c0": 1,
+     "r01c1": 1,
+     "r02c0": 1,
+     "r03c2": 1,
+     "r03c4": 1,
+     "r05c2": 1,
+     "r04s": 1
+    }
+   },
+   "answer_raw": "In 1810, François Aimé Louis Dumoulin published a collection of 150 engravings themed on the journey of Robinson Crusoe [r01c1, r02c0].",
+   "claims_generated": [
+    {
+     "text": "In 1810, François Aimé Louis Dumoulin published a collection of 150 engravings themed on the journey of Robinson Crusoe [r01c1, r02c0].",
+     "citations": [
+      "r01c1",
+      "r02c0"
+     ]
+    }
+   ],
+   "uncited_claims": [],
+   "fabricated_citations": 0,
+   "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
+   "thinking": false,
+   "prompt_tokens": 2175,
+   "completion_tokens": 45,
+   "finish_reason": "stop",
+   "abstained": false,
+   "abstain_reason": null,
+   "answer": "In 1810, François Aimé Louis Dumoulin published a collection of 150 engravings themed on the journey of Robinson Crusoe [r01c1, r02c0].",
+   "claims": [
+    {
+     "text": "In 1810, François Aimé Louis Dumoulin published a collection of 150 engravings themed on the journey of Robinson Crusoe [r01c1, r02c0].",
+     "citations": [
+      "r01c1",
+      "r02c0"
+     ],
+     "support": {
+      "choice": "supported",
+      "confidence": 1.0,
+      "probabilities": {
+       "supported": 1.0,
+       "contradicted": 0.0,
+       "unsupported": 0.0
+      }
+     },
+     "model": "self:unsloth/gemma-4-E2B-it-qat-GGUF:probabilities",
+     "cached": false
+    }
+   ],
+   "citations": [
+    "r01c1",
+    "r02c0"
+   ],
+   "conflicts": [],
+   "stripped": [],
+   "addresses_query": {
+    "noul": 0.5,
+    "passed": true,
+    "cached": false
+   },
+   "s4": {
+    "n_requests": 2,
+    "verdicts": [
+     {
+      "text": "In 1810, François Aimé Louis Dumoulin published a collection of 150 engravings themed on the journey of Robinson Crusoe [r01c1, r02c0].",
+      "verdict": "keep",
+      "support": {
+       "choice": "supported",
+       "confidence": 1.0,
+       "probabilities": {
+        "supported": 1.0,
+        "contradicted": 0.0,
+        "unsupported": 0.0
+       }
+      }
+     }
+    ]
+   },
+   "m2": {
+    "n_written": 1,
+    "written": [
+     {
+      "drawer_id": "vf_efa5c1000c147ecf",
+      "created": true,
+      "text": "In 1810, François Aimé Louis Dumoulin published a collection of 150 engravings themed on the journey of Robinson Crusoe.",
+      "support_prob": 1.0
+     }
+    ],
+    "skipped": [],
+    "disabled": false
+   },
+   "judge": {
+    "n_requests": 54,
+    "n_cached": 0,
+    "input_tokens": 22806,
+    "output_tokens": 5839,
+    "cost_usd": 0.000958,
+    "stages": {
+     "s0": {
+      "n_requests": 1,
+      "n_cached": 0,
+      "input_tokens": 203,
+      "output_tokens": 164
+     },
+     "s1_snippets": {
+      "n_requests": 30,
+      "n_cached": 0,
+      "input_tokens": 9004,
+      "output_tokens": 3335
+     },
+     "s1_chunks": {
+      "n_requests": 20,
+      "n_cached": 0,
+      "input_tokens": 10901,
+      "output_tokens": 2229
+     },
+     "s2": {
+      "n_requests": 1,
+      "n_cached": 0,
+      "input_tokens": 1878,
+      "output_tokens": 50
+     },
+     "s4": {
+      "n_requests": 2,
+      "n_cached": 0,
+      "input_tokens": 820,
+      "output_tokens": 61
+     }
+    }
+   },
+   "generator_s": 0.819,
+   "latency_s": 245.664,
+   "wall_s": 245.753,
+   "grade": {
+    "label": "correct",
+    "letter": "A",
+    "model": "claude-sonnet-5",
+    "cached": false,
+    "reply": "A"
+   },
+   "claim_support": [
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    }
+   ]
+  },
+  {
+   "question_id": "simpleqa-0184",
+   "query": "Who was the first cardiologist in Kashmir?",
+   "gold": "Dr Upendra Kaul",
+   "arm": "C-self",
+   "s0": {
+    "retrieve": true,
+    "retrieve_judged": true,
+    "source": "web",
+    "source_judged": "web",
+    "time_range": null,
+    "category": "general",
+    "forced": {
+     "search": true,
+     "web": true
+    },
+    "since": null,
+    "answers": {
+     "needs_search": {
+      "type": "noul",
+      "noul": 0.51
+     },
+     "source": {
+      "type": "choice",
+      "choice": "web",
+      "confidence": 1.0,
+      "probabilities": {
+       "web": 1.0,
+       "palace": 0.0,
+       "both": 0.0
+      }
+     },
+     "recency": {
+      "type": "choice",
+      "choice": "any",
+      "confidence": 0.0,
+      "probabilities": {
+       "any": 1.0,
+       "year": 1.0,
+       "month": 1.0,
+       "week": 1.0,
+       "day": 1.0
+      }
+     },
+     "category": {
+      "type": "choice",
+      "choice": "general",
+      "confidence": 1.0,
+      "probabilities": {
+       "general": 1.0,
+       "news": 0.0,
+       "science": 0.0,
+       "it": 0.0
+      }
+     }
+    },
+    "model": "self:unsloth/gemma-4-E2B-it-qat-GGUF:probabilities",
+    "cached": false,
+    "n_requests": 1,
+    "n_cached": 0,
+    "input_tokens": 179,
+    "output_tokens": 159
+   },
+   "today": "2026-09-19",
+   "seed": 20260919,
+   "searched": true,
+   "s1": {
+    "snippets": {
+     "n": 30,
+     "reasons": {
+      "evidence": 20,
+      "off_topic": 5,
+      "nothing_usable": 2,
+      "boilerplate": 3
+     },
+     "survivors": [
+      1,
+      2,
+      5,
+      6,
+      7,
+      8,
+      11,
+      13,
+      14,
+      15,
+      16,
+      18,
+      19,
+      20,
+      21,
+      23,
+      27,
+      28,
+      29,
+      30
+     ],
+     "fetched": [
+      1,
+      2,
+      5,
+      6,
+      7
+     ],
+     "not_fetched": [
+      8,
+      11,
+      13,
+      14,
+      15,
+      16,
+      18,
+      19,
+      20,
+      21,
+      23,
+      27,
+      28,
+      29,
+      30
+     ],
+     "fallback_snippets": []
+    },
+    "chunks": {
+     "n": 32,
+     "reasons": {
+      "evidence": 16,
+      "off_topic": 11,
+      "boilerplate": 2,
+      "nothing_usable": 2,
+      "injection": 1
+     },
+     "dropped": [
+      {
+       "id": "r02c4",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r02c5",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r02c6",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r02c7",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r05c1",
+       "reason": "boilerplate"
+      },
+      {
+       "id": "r05c3",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r05c4",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r05c6",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r05c7",
+       "reason": "nothing_usable"
+      },
+      {
+       "id": "r06c3",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r06c4",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r06c6",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r07c1",
+       "reason": "boilerplate"
+      },
+      {
+       "id": "r07c3",
+       "reason": "off_topic"
+      },
+      {
+       "id": "r07c4",
+       "reason": "injection"
+      },
+      {
+       "id": "r07c5",
+       "reason": "nothing_usable"
+      }
+     ]
+    }
+   },
+   "s2": [
+    {
+     "action": "generate",
+     "round": 0,
+     "sufficient": true,
+     "sufficient_p": 1.0,
+     "conflicts": false,
+     "conflicts_p": 0.0,
+     "evidence_ids": [
+      "r01c0",
+      "r01c1",
+      "r02c0",
+      "r02c1",
+      "r02c2",
+      "r02c3"
+     ],
+     "answers": {
+      "evidence_sufficient": {
+       "type": "noul",
+       "noul": 1.0
+      },
+      "evidence_conflicts": {
+       "type": "noul",
+       "noul": 0.0
+      }
+     },
+     "model": "self:unsloth/gemma-4-E2B-it-qat-GGUF:probabilities",
+     "cached": false,
+     "n_requests": 1,
+     "n_cached": 0,
+     "input_tokens": 2200,
+     "output_tokens": 52
+    }
+   ],
+   "refine": null,
+   "evidence": [
+    {
+     "id": "r01c0",
+     "drawer_id": "ev_4b49d3032efe6328_c0",
+     "kind": "chunk",
+     "lane": "web",
+     "domain": "theindiantribal.com",
+     "source_type": "unknown",
+     "engine_rank": 1,
+     "similarity": null,
+     "n_tokens": 300,
+     "rrf_score": 0.03278688524590164,
+     "gate": {
+      "is_relevant": 1.0,
+      "contains_answer_evidence": 1.0,
+      "contradicts_query_premise": 0.0,
+      "contains_prompt_injection": 0.0,
+      "is_promotional_or_boilerplate": 0.0
+     },
+     "text": "Dr Nasir Ali, who has recently been awarded Jammu & Kashmir’s first Tribal Award for “outstanding achievement in professional education,” believes the recognition will greatly motivate Kashmiri youngsters to pursue excellence.\nThe UT’s first interventional cardiologist from a tribal community, Dr Ali has many distinctions to his name, including having performed some rare and complex surgeries.\nDr Nasir Ali has taken part in hundreds of free cardiac check-up camps at old age homes, schools, ashram, gurudwara, in rural and border areas, military and paramilitary camps and even frontline outposts of RS Pura and Samba sectors\nHe works as consultant cardiologist at the Government Super Speciality Hospital, Jammu, but does a great deal of work outside of those walls too.\nDr Ali has attended and organised around 300 free cardiac health check-up camps at old age homes, schools, ashram, gurudwara, in rural and border areas, military and paramilitary camps and even frontline outposts of RS Pura and Samba sectors.\nThe cardiologist has multiple research publications to his credit. He has also written two books and presented papers at leading international conferences.\nDr Ali remembers his journey from a far-flung village to his current stature. “I have faced many hardships before acquiring my skills,” he says. Born in Bhalwal tehsil of Jammu district, he recalls his long walks to the nearest transport system from his remote village.\nDr Ali is a"
+    },
+    {
+     "id": "r01c1",
+     "drawer_id": "ev_5619f162b2afc4cd_c1",
+     "kind": "chunk",
+     "lane": "web",
+     "domain": "theindiantribal.com",
+     "source_type": "unknown",
+     "engine_rank": 1,
+     "similarity": null,
+     "n_tokens": 212,
+     "rrf_score": 0.03278688524590164,
+     "gate": {
+      "is_relevant": 1.0,
+      "contains_answer_evidence": 1.0,
+      "contradicts_query_premise": 0.0,
+      "contains_prompt_injection": 0.0,
+      "is_promotional_or_boilerplate": 0.0
+     },
+     "text": "I have faced many hardships before acquiring my skills,” he says. Born in Bhalwal tehsil of Jammu district, he recalls his long walks to the nearest transport system from his remote village.\nDr Ali is a true son of the soil and finished most of his education in Jammu & Kashmir. While at Government Ranbir School, he always achieved distinction. He also cracked his entrance test in the first attempt, completing MBBS from the oldest medical college of the state, the prestigious Government Medical College, Srinagar. He went on to do MD (Medicine) from Sher-I-Kashmir Institute of Medical Sciences.\nThe cardiologist only ventured out of his native state for super-specialisation — a Diplomate of National Board in Cardiology from Medanta, The Medicity in Gurgaon.\nDr Ali hopes to “continue to serve society with the same zeal and zest in the coming years too,” saying, “I am thankful to the jury for acknowledging our hard work and for bestowing the honour at this point of time.”"
+    },
+    {
+     "id": "r02c0",
+     "drawer_id": "ev_955d26ffc6035fe4_c0",
+     "kind": "chunk",
+     "lane": "web",
+     "domain": "facebook.com",
+     "source_type": "unknown",
+     "engine_rank": 2,
+     "similarity": null,
+     "n_tokens": 300,
+     "rrf_score": 0.032266458495966696,
+     "gate": {
+      "is_relevant": 1.0,
+      "contains_answer_evidence": 1.0,
+      "contradicts_query_premise": 0.0,
+      "contains_prompt_injection": 0.0,
+      "is_promotional_or_boilerplate": 0.0
+     },
+     "text": "<link data-default-icon=\"https://static.xx.fbcdn.net/rsrc.php/y1/r/ay1hV6OlegS.ico\" data-badged-icon=\"https://static.xx.fbcdn.net/rsrc.php/yD/r/UJj0tgk-RrT.ico\" rel=\"shortcut icon\" href=\"https://static.xx.fbcdn.net/rsrc.php/y1/r/ay1hV6OlegS.ico\" /> <meta property=\"og:description\" content=\"Dr. Abdul Ahad Guru (1939–1993) 🌟\nThe “Healer of Hearts”\n\nDr. Abdul Ahad Guru, fondly remembered as the “Healer of Hearts,” was a pioneering cardiologist and a compassionate humanitarian from...\" /> <meta property=\"og:image\" content=\"https://scontent-atl3-2.xx.fbcdn.net/v/t39.30808-6/662291387_1262620562679979_3394217687574890192_n.jpg?stp=dst-jpg_tt6&cstp=mx2048x2048&ctp=s600x600&_nc_cat=105&ccb=1-7&_nc_sid=b96d88&_nc_ohc=5axvhRQANlAQ7kNvwFCELf6&_nc_oc=AdoZqQWrYNQKQ16yCG-qDuzqDl5j5Dlkj1_unPUCLK"
+    },
+    {
+     "id": "r02c1",
+     "drawer_id": "ev_90a0012ddb3c02bc_c1",
+     "kind": "chunk",
+     "lane": "web",
+     "domain": "facebook.com",
+     "source_type": "unknown",
+     "engine_rank": 2,
+     "similarity": null,
+     "n_tokens": 300,
+     "rrf_score": 0.032266458495966696,
+     "gate": {
+      "is_relevant": 1.0,
+      "contains_answer_evidence": 1.0,
+      "contradicts_query_premise": 0.0,
+      "contains_prompt_injection": 0.0,
+      "is_promotional_or_boilerplate": 0.0
+     },
+     "text": "QANlAQ7kNvwFCELf6&_nc_oc=AdoZqQWrYNQKQ16yCG-qDuzqDl5j5Dlkj1_unPUCLK5RDBl2dxd11lneRZkGCoThzOQ&_nc_zt=23&_nc_ht=scontent-atl3-2.xx&_nc_gid=F2b-GXPLNQDe-mxZhpC8Xw&_nc_ss=7b20f&oh=00_AQIX6lBNbCadXu_vFAvp-BGkRVlX2t_thFybJpEky2wy4g&oe=6AB49F0E\" /> <meta name=\"keywords\" content=\"medical hero,kashmiri cardiologist,healer of hearts,legacy of kindness,compassionate humanitarian,kashmir,cardiologist,open-heart surgery,sher-i-kashmir institute of medical sciences,dr. abdul ahad guru\" /><link rel=\"alternate\" media=\"only screen and (max-width: 640px)\" href=\"https://m.facebook.com/resh"
+    },
+    {
+     "id": "r02c2",
+     "drawer_id": "ev_ad79217d784f6d4d_c2",
+     "kind": "chunk",
+     "lane": "web",
+     "domain": "facebook.com",
+     "source_type": "unknown",
+     "engine_rank": 2,
+     "similarity": null,
+     "n_tokens": 300,
+     "rrf_score": 0.032266458495966696,
+     "gate": {
+      "is_relevant": 1.0,
+      "contains_answer_evidence": 1.0,
+      "contradicts_query_premise": 0.0,
+      "contains_prompt_injection": 0.0,
+      "is_promotional_or_boilerplate": 0.0
+     },
+     "text": "-kashmir institute of medical sciences,dr. abdul ahad guru\" /><link rel=\"alternate\" media=\"only screen and (max-width: 640px)\" href=\"https://m.facebook.com/reshveer/posts/dr-abdul-ahad-guru-19391993-the-healer-of-heartsdr-abdul-ahad-guru-fondly-rememb/1262925559316146/\" /> <meta name=\"twitter:description\" content=\"Dr. Abdul Ahad Guru (1939–1993) 🌟\nThe “Healer of Hearts”\n\nDr. Abdul Ahad Guru, fondly remembered as the “Healer of Hearts,” was a pioneering cardiologist and a compassionate humanitarian from...\" /><meta name=\"twitter:image\" content=\"https://scontent-atl3-2.xx.fbcdn.net/v/t39.30808-6/662291387_1262620562679979_3394217687574890192_n.jpg?stp=dst-jpg_tt6&cstp=mx2048x2048&ctp=s600x600&_nc_cat=105&ccb=1-7&_nc_sid=b96d88&_nc_ohc=5axvhRQANlAQ7kNvwFCELf6&_nc_oc=AdoZqQWrYNQKQ16yCG-qDuzqDl5j5Dlkj1_unPU"
+    },
+    {
+     "id": "r02c3",
+     "drawer_id": "ev_0ac773b036aba0ed_c3",
+     "kind": "chunk",
+     "lane": "web",
+     "domain": "facebook.com",
+     "source_type": "unknown",
+     "engine_rank": 2,
+     "similarity": null,
+     "n_tokens": 300,
+     "rrf_score": 0.032266458495966696,
+     "gate": {
+      "is_relevant": 1.0,
+      "contains_answer_evidence": 1.0,
+      "contradicts_query_premise": 0.0,
+      "contains_prompt_injection": 0.0,
+      "is_promotional_or_boilerplate": 0.0
+     },
+     "text": "RQANlAQ7kNvwFCELf6&_nc_oc=AdoZqQWrYNQKQ16yCG-qDuzqDl5j5Dlkj1_unPUCLK5RDBl2dxd11lneRZkGCoThzOQ&_nc_zt=23&_nc_ht=scontent-atl3-2.xx&_nc_gid=F2b-GXPLNQDe-mxZhpC8Xw&_nc_ss=7b20f&oh=00_AQIX6lBNbCadXu_vFAvp-BGkRVlX2t_thFybJpEky2wy4g&oe=6AB49F0E\" /> :root, .__fb-light-mode:root, .__fb-light-mode {--fds-black:#000000;--fds-black-alpha-05:rgba(0, 0, 0, 0.05);--fds-black-alpha-10:rgba(0, 0, 0, 0.1);--fds-black-alpha-15:rgba(0, 0, 0, 0.15);--fds-black-alpha-20:rgba(0, 0, 0, 0.2);--fds-black-alpha-30:rgba(0, 0, 0, 0.3);--fds-black-alpha-40:rgba("
+    }
+   ],
+   "evidence_ids": [
+    "r01c0",
+    "r01c1",
+    "r02c0",
+    "r02c1",
+    "r02c2",
+    "r02c3"
+   ],
+   "evidence_texts": {
+    "r01c0": "Dr Nasir Ali, who has recently been awarded Jammu & Kashmir’s first Tribal Award for “outstanding achievement in professional education,” believes the recognition will greatly motivate Kashmiri youngsters to pursue excellence.\nThe UT’s first interventional cardiologist from a tribal community, Dr Ali has many distinctions to his name, including having performed some rare and complex surgeries.\nDr Nasir Ali has taken part in hundreds of free cardiac check-up camps at old age homes, schools, ashram, gurudwara, in rural and border areas, military and paramilitary camps and even frontline outposts of RS Pura and Samba sectors\nHe works as consultant cardiologist at the Government Super Speciality Hospital, Jammu, but does a great deal of work outside of those walls too.\nDr Ali has attended and organised around 300 free cardiac health check-up camps at old age homes, schools, ashram, gurudwara, in rural and border areas, military and paramilitary camps and even frontline outposts of RS Pura and Samba sectors.\nThe cardiologist has multiple research publications to his credit. He has also written two books and presented papers at leading international conferences.\nDr Ali remembers his journey from a far-flung village to his current stature. “I have faced many hardships before acquiring my skills,” he says. Born in Bhalwal tehsil of Jammu district, he recalls his long walks to the nearest transport system from his remote village.\nDr Ali is a",
+    "r01c1": "I have faced many hardships before acquiring my skills,” he says. Born in Bhalwal tehsil of Jammu district, he recalls his long walks to the nearest transport system from his remote village.\nDr Ali is a true son of the soil and finished most of his education in Jammu & Kashmir. While at Government Ranbir School, he always achieved distinction. He also cracked his entrance test in the first attempt, completing MBBS from the oldest medical college of the state, the prestigious Government Medical College, Srinagar. He went on to do MD (Medicine) from Sher-I-Kashmir Institute of Medical Sciences.\nThe cardiologist only ventured out of his native state for super-specialisation — a Diplomate of National Board in Cardiology from Medanta, The Medicity in Gurgaon.\nDr Ali hopes to “continue to serve society with the same zeal and zest in the coming years too,” saying, “I am thankful to the jury for acknowledging our hard work and for bestowing the honour at this point of time.”",
+    "r02c0": "<link data-default-icon=\"https://static.xx.fbcdn.net/rsrc.php/y1/r/ay1hV6OlegS.ico\" data-badged-icon=\"https://static.xx.fbcdn.net/rsrc.php/yD/r/UJj0tgk-RrT.ico\" rel=\"shortcut icon\" href=\"https://static.xx.fbcdn.net/rsrc.php/y1/r/ay1hV6OlegS.ico\" /> <meta property=\"og:description\" content=\"Dr. Abdul Ahad Guru (1939–1993) 🌟\nThe “Healer of Hearts”\n\nDr. Abdul Ahad Guru, fondly remembered as the “Healer of Hearts,” was a pioneering cardiologist and a compassionate humanitarian from...\" /> <meta property=\"og:image\" content=\"https://scontent-atl3-2.xx.fbcdn.net/v/t39.30808-6/662291387_1262620562679979_3394217687574890192_n.jpg?stp=dst-jpg_tt6&cstp=mx2048x2048&ctp=s600x600&_nc_cat=105&ccb=1-7&_nc_sid=b96d88&_nc_ohc=5axvhRQANlAQ7kNvwFCELf6&_nc_oc=AdoZqQWrYNQKQ16yCG-qDuzqDl5j5Dlkj1_unPUCLK",
+    "r02c1": "QANlAQ7kNvwFCELf6&_nc_oc=AdoZqQWrYNQKQ16yCG-qDuzqDl5j5Dlkj1_unPUCLK5RDBl2dxd11lneRZkGCoThzOQ&_nc_zt=23&_nc_ht=scontent-atl3-2.xx&_nc_gid=F2b-GXPLNQDe-mxZhpC8Xw&_nc_ss=7b20f&oh=00_AQIX6lBNbCadXu_vFAvp-BGkRVlX2t_thFybJpEky2wy4g&oe=6AB49F0E\" /> <meta name=\"keywords\" content=\"medical hero,kashmiri cardiologist,healer of hearts,legacy of kindness,compassionate humanitarian,kashmir,cardiologist,open-heart surgery,sher-i-kashmir institute of medical sciences,dr. abdul ahad guru\" /><link rel=\"alternate\" media=\"only screen and (max-width: 640px)\" href=\"https://m.facebook.com/resh",
+    "r02c2": "-kashmir institute of medical sciences,dr. abdul ahad guru\" /><link rel=\"alternate\" media=\"only screen and (max-width: 640px)\" href=\"https://m.facebook.com/reshveer/posts/dr-abdul-ahad-guru-19391993-the-healer-of-heartsdr-abdul-ahad-guru-fondly-rememb/1262925559316146/\" /> <meta name=\"twitter:description\" content=\"Dr. Abdul Ahad Guru (1939–1993) 🌟\nThe “Healer of Hearts”\n\nDr. Abdul Ahad Guru, fondly remembered as the “Healer of Hearts,” was a pioneering cardiologist and a compassionate humanitarian from...\" /><meta name=\"twitter:image\" content=\"https://scontent-atl3-2.xx.fbcdn.net/v/t39.30808-6/662291387_1262620562679979_3394217687574890192_n.jpg?stp=dst-jpg_tt6&cstp=mx2048x2048&ctp=s600x600&_nc_cat=105&ccb=1-7&_nc_sid=b96d88&_nc_ohc=5axvhRQANlAQ7kNvwFCELf6&_nc_oc=AdoZqQWrYNQKQ16yCG-qDuzqDl5j5Dlkj1_unPU",
+    "r02c3": "RQANlAQ7kNvwFCELf6&_nc_oc=AdoZqQWrYNQKQ16yCG-qDuzqDl5j5Dlkj1_unPUCLK5RDBl2dxd11lneRZkGCoThzOQ&_nc_zt=23&_nc_ht=scontent-atl3-2.xx&_nc_gid=F2b-GXPLNQDe-mxZhpC8Xw&_nc_ss=7b20f&oh=00_AQIX6lBNbCadXu_vFAvp-BGkRVlX2t_thFybJpEky2wy4g&oe=6AB49F0E\" /> :root, .__fb-light-mode:root, .__fb-light-mode {--fds-black:#000000;--fds-black-alpha-05:rgba(0, 0, 0, 0.05);--fds-black-alpha-10:rgba(0, 0, 0, 0.1);--fds-black-alpha-15:rgba(0, 0, 0, 0.15);--fds-black-alpha-20:rgba(0, 0, 0, 0.2);--fds-black-alpha-30:rgba(0, 0, 0, 0.3);--fds-black-alpha-40:rgba("
+   },
+   "conflicts_block": [],
+   "fusion": {
+    "retriever": {
+     "r01c0": 1,
+     "r01c1": 1,
+     "r02c0": 3,
+     "r02c1": 3,
+     "r02c2": 3,
+     "r02c3": 3,
+     "r05c0": 7,
+     "r05c2": 7,
+     "r05c5": 7,
+     "r06c0": 10,
+     "r06c1": 10,
+     "r06c2": 10,
+     "r06c5": 10,
+     "r06c7": 10,
+     "r07c0": 15,
+     "r07c2": 15
+    },
+    "palace": {},
+    "evidence": {
+     "r01c0": 1,
+     "r01c1": 1,
+     "r02c0": 1,
+     "r02c1": 1,
+     "r02c2": 1,
+     "r02c3": 1,
+     "r05c0": 1,
+     "r05c2": 1,
+     "r05c5": 1,
+     "r06c0": 1,
+     "r06c1": 1,
+     "r06c2": 1,
+     "r06c5": 1,
+     "r06c7": 1,
+     "r07c0": 1,
+     "r07c2": 1
+    }
+   },
+   "answer_raw": "Dr Nasir Ali is noted as the UT's first interventional cardiologist from a tribal community [r01c0].",
+   "claims_generated": [
+    {
+     "text": "Dr Nasir Ali is noted as the UT's first interventional cardiologist from a tribal community [r01c0].",
+     "citations": [
+      "r01c0"
+     ]
+    }
+   ],
+   "uncited_claims": [],
+   "fabricated_citations": 0,
+   "generator_model": "unsloth/gemma-4-E2B-it-qat-GGUF",
+   "thinking": false,
+   "prompt_tokens": 2049,
+   "completion_tokens": 26,
+   "finish_reason": "stop",
+   "abstained": false,
+   "abstain_reason": null,
+   "answer": "Dr Nasir Ali is noted as the UT's first interventional cardiologist from a tribal community [r01c0].",
+   "claims": [
+    {
+     "text": "Dr Nasir Ali is noted as the UT's first interventional cardiologist from a tribal community [r01c0].",
+     "citations": [
+      "r01c0"
+     ],
+     "support": {
+      "choice": "supported",
+      "confidence": 1.0,
+      "probabilities": {
+       "supported": 1.0,
+       "contradicted": 0.0,
+       "unsupported": 0.0
+      }
+     },
+     "model": "self:unsloth/gemma-4-E2B-it-qat-GGUF:probabilities",
+     "cached": false
+    }
+   ],
+   "citations": [
+    "r01c0"
+   ],
+   "conflicts": [],
+   "stripped": [],
+   "addresses_query": {
+    "noul": 0.99,
+    "passed": true,
+    "cached": false
+   },
+   "s4": {
+    "n_requests": 2,
+    "verdicts": [
+     {
+      "text": "Dr Nasir Ali is noted as the UT's first interventional cardiologist from a tribal community [r01c0].",
+      "verdict": "keep",
+      "support": {
+       "choice": "supported",
+       "confidence": 1.0,
+       "probabilities": {
+        "supported": 1.0,
+        "contradicted": 0.0,
+        "unsupported": 0.0
+       }
+      }
+     }
+    ]
+   },
+   "m2": {
+    "n_written": 1,
+    "written": [
+     {
+      "drawer_id": "vf_bd826a26c9c61cf5",
+      "created": true,
+      "text": "Dr Nasir Ali is noted as the UT's first interventional cardiologist from a tribal community.",
+      "support_prob": 1.0
+     }
+    ],
+    "skipped": [],
+    "disabled": false
+   },
+   "judge": {
+    "n_requests": 66,
+    "n_cached": 0,
+    "input_tokens": 28305,
+    "output_tokens": 7027,
+    "cost_usd": 0.001189,
+    "stages": {
+     "s0": {
+      "n_requests": 1,
+      "n_cached": 0,
+      "input_tokens": 179,
+      "output_tokens": 159
+     },
+     "s1_snippets": {
+      "n_requests": 30,
+      "n_cached": 0,
+      "input_tokens": 7566,
+      "output_tokens": 3208
+     },
+     "s1_chunks": {
+      "n_requests": 32,
+      "n_cached": 0,
+      "input_tokens": 17685,
+      "output_tokens": 3509
+     },
+     "s2": {
+      "n_requests": 1,
+      "n_cached": 0,
+      "input_tokens": 2200,
+      "output_tokens": 52
+     },
+     "s4": {
+      "n_requests": 2,
+      "n_cached": 0,
+      "input_tokens": 675,
+      "output_tokens": 99
+     }
+    }
+   },
+   "generator_s": 0.721,
+   "latency_s": 508.729,
+   "wall_s": 508.773,
+   "grade": {
+    "label": "incorrect",
+    "letter": "B",
+    "model": "claude-sonnet-5",
+    "cached": false,
+    "reply": "B"
+   },
+   "claim_support": [
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    }
+   ]
+  }
+ ],
+ "metrics": {
+  "n": 2,
+  "correct": 1,
+  "incorrect": 1,
+  "not_attempted": 0,
+  "attempted": 2,
+  "truthfulness": 0.0,
+  "hallucination_rate": 0.5,
+  "coverage": 1.0,
+  "truthfulness_ci": [
+   -1.0,
+   1.0
+  ],
+  "hallucination_rate_ci": [
+   0.0,
+   1.0
+  ],
+  "coverage_ci": [
+   1.0,
+   1.0
+  ],
+  "bootstrap": {
+   "resamples": 1000,
+   "seed": 20260919
+  },
+  "grader_model": "claude-sonnet-5",
+  "graded_at": "2026-09-19T19:29:25Z",
+  "fabricated_citations_total": 0,
+  "claim_support": {
+   "kept_claims": 2,
+   "supported": 2,
+   "rate": 1.0,
+   "n_questions": 2,
+   "n_questions_with_claims": 2,
+   "rate_ci": [
+    1.0,
+    1.0
+   ],
+   "bootstrap": {
+    "resamples": 1000,
+    "seed": 20260919
+   }
+  }
+ }
+}
