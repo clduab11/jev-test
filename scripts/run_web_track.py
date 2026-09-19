@@ -46,7 +46,7 @@ def run(args: list[str]) -> int:
     log("run: " + " ".join(args))
     with LOG.open("a", encoding="utf-8") as handle:
         process = subprocess.run(
-            [sys.executable, *args], cwd=ROOT, stdout=handle, stderr=subprocess.STDOUT, text=True
+            [sys.executable, *args], cwd=ROOT, stdout=handle, stderr=subprocess.STDOUT, text=True, check=False
         )
     log(f"exit {process.returncode}")
     return process.returncode
