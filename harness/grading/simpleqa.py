@@ -14,7 +14,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
+import os
 import re
+import threading
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
@@ -24,6 +27,17 @@ from harness.config import ROOT, env, load_env
 PROMPT_PATH = ROOT / "harness" / "grading" / "prompts" / "simpleqa_grader.txt"
 CACHE_DIR = ROOT / "json_cache" / "grading"
 LETTERS = {"A": "correct", "B": "incorrect", "C": "not_attempted"}
+GRADER_MAX_TOKENS = 512  # see the note in claim_support.py: the grader deliberates first
+
+log = logging.getLogger(__name__)
+
+
+def write_cache_entry(path: Path, entry: dict) -> None:
+    """Write a cache entry atomically, so a killed run never leaves a torn file that
+    poisons every later grading pass."""
+    tmp = path.with_name(f"{path.stem}.{os.getpid()}.{threading.get_ident()}.tmp")
+    tmp.write_text(json.dumps(entry, ensure_ascii=False, indent=1), encoding="utf-8")
+    os.replace(tmp, path)
 
 
 def grader_template() -> str:
@@ -67,14 +81,17 @@ def grade(
     cache_dir.mkdir(parents=True, exist_ok=True)
     path = cache_dir / f"{key}.json"
     if path.exists():
-        entry = json.loads(path.read_text(encoding="utf-8"))
-        return {"label": entry["label"], "letter": entry["letter"], "model": entry["model"], "cached": True, "reply": entry["reply"]}
+        try:
+            entry = json.loads(path.read_text(encoding="utf-8"))
+            return {"label": entry["label"], "letter": entry["letter"], "model": entry["model"], "cached": True, "reply": entry["reply"]}
+        except (OSError, ValueError, KeyError):
+            log.warning("unreadable grading cache entry %s; grading again", path.name)
     client = client or _client()
     response = client.chat.completions.create(
         model=model,
         messages=[{"role": "user", "content": prompt}],
         temperature=0,
-        max_tokens=8,
+        max_tokens=GRADER_MAX_TOKENS,
     )
     reply = (response.choices[0].message.content or "").strip()
     letter = parse_letter(reply)
@@ -89,7 +106,7 @@ def grade(
             "output_tokens": getattr(response.usage, "completion_tokens", None),
         },
     }
-    path.write_text(json.dumps(entry, ensure_ascii=False, indent=1), encoding="utf-8")
+    write_cache_entry(path, entry)
     return {"label": entry["label"], "letter": letter, "model": entry["model"], "cached": False, "reply": reply}
 
 
@@ -99,7 +116,15 @@ def grade_records(records: list[dict[str, Any]], model: str | None = None, worke
 
     def one(record: dict[str, Any]) -> dict[str, Any]:
         answer = "" if record.get("abstained") else (record.get("answer") or "")
-        return grade(record["query"], record["gold"], answer, model=model, client=client)
+        for attempt in range(3):
+            try:
+                return grade(record["query"], record["gold"], answer, model=model, client=client)
+            except Exception as exc:  # noqa: BLE001 - one bad call must not lose the other 499
+                log.warning("grading call failed (%d/3) for %s: %s", attempt + 1, record.get("question_id"), exc)
+                last = exc
+        # A record the grader could not reach is not "not attempted"; mark it so
+        # grade_file can report it rather than folding it into the coverage denominator.
+        return {"label": None, "letter": None, "model": model, "cached": False, "reply": "", "error": str(last)[:200]}
 
     with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
         return list(pool.map(one, records))

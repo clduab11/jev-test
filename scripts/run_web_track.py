@@ -119,7 +119,11 @@ def wait_for_freeze(snapshot: str, n: int, seed: int, sleep_s: float, stale_minu
         age_min = (time.time() - mtime) / 60 if mtime else 1e9
         if age_min > stale_minutes:
             log(f"freeze at {count} of {n}, manifest untouched for {age_min:.0f} min; running it here")
-            run(["-m", "harness.retrieval.snapshot", "--dataset", "simpleqa", "--n", str(n), "--seed", str(seed), "--id", snapshot, "--sleep", str(sleep_s)])
+            code = run(["-m", "harness.retrieval.snapshot", "--dataset", "simpleqa", "--n", str(n), "--seed", str(seed), "--id", snapshot, "--sleep", str(sleep_s)])
+            if code != 0:
+                # A freeze that fails fast (SearXNG down) would otherwise spin this loop.
+                log("freeze subprocess failed; waiting before trying again")
+                time.sleep(120)
             continue
         log(f"freeze at {count} of {n}; waiting")
         time.sleep(120)
@@ -163,7 +167,10 @@ def main() -> int:
     to_grade = [str(ROOT / "results" / f"{arm}_simpleqa_{args.snapshot}.json") for arm in ("A", "B", "D")]
     if args.cself_pilot and results_complete("C-self", args.pilot, 20):
         to_grade.append(str(ROOT / "results" / f"C-self_simpleqa_{args.pilot}.json"))
-    run(["-m", "harness.run", "--grade", *to_grade])
+    code = run(["-m", "harness.run", "--grade", *to_grade])
+    if code != 0:
+        log("grading FAILED; the arms are complete but the results are ungraded")
+        return code
     log("web track done")
     return 0
 

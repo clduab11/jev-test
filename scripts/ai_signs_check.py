@@ -4,7 +4,10 @@ Usage:  python scripts/ai_signs_check.py README.md docs/*.md
 Exit code is 1 when any flag is found, so it can gate a commit.
 Word list and patterns were taken from the page as read on 2026-09-19.
 """
-import re, sys, pathlib
+import pathlib
+import re
+import sys
+
 WORDS = r"""additionally|boasts?|bolster\w*|crucial|delve|emphasi[sz]\w*|enduring|garner\w*|intricate|intricacies|interplay|landscape|meticulous\w*|pivotal|underscor\w*|vibrant|align\w* with|enhanc\w*|foster\w*|highlighting|showcas\w*|tapestry|testament|seamless\w*|robust\w*|leverag\w*|navigat\w*|realm|comprehensive|notably|moreover|furthermore|ensur\w*|streamlin\w*|cutting-edge|innovative|game-?changer|unlock\w*|harness(?:es|ing| the)|elevat\w*|empower\w*|transformative|serves as|stands as|plays? an? \w+ role|vital role|associated with|connected to|worth noting|important to note|in today'?s|at its core|deep dive|in conclusion|in summary|^overall,|significant\w*|essential\w*|journey|embark\w*|excited|i hope this helps|it'?s important|multifaceted|nuanced|holistic|synergy|paradigm|groundbreaking|revolutioni[sz]\w*|state-of-the-art|best practices|in the realm|a wide range of|plays a (?:key|crucial)"""
 PATTERNS = {
  "em dash": r"—",
@@ -26,7 +29,7 @@ for path in sys.argv[1:]:
     for name, pat in PATTERNS.items():
         for i, line in enumerate(text.splitlines(), 1):
             if line.strip().startswith("```") : pass
-            for m in re.finditer(pat, line, flags=re.I|re.M):
+            for m in re.finditer(pat, line, flags=re.IGNORECASE|re.MULTILINE):
                 hits += 1
                 print(f"  [{name}] line {i}: ...{line[max(0,m.start()-40):m.end()+40].strip()}...")
     heads = [l for l in text.splitlines() if l.startswith("#")]

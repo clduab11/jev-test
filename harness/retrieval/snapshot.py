@@ -277,12 +277,22 @@ def replay(snapshot_id: str, question_id: str, palace: Palace | None = None) -> 
     drawers = get_drawers(palace, wanted)
     results: list[dict[str, Any]] = []
     missing: list[str] = []
+    stale: list[dict[str, Any]] = []
     for result, page in zip(entry["results"], entry["pages"], strict=True):
         chunks: list[dict[str, Any]] = []
         for chunk in page["chunks"]:
             drawer = drawers.get(chunk["drawer_id"])
-            if drawer is None or _sha256(drawer["text"]) != chunk["sha256"]:
+            if drawer is None:
                 missing.append(chunk["drawer_id"])
+                continue
+            if _sha256(drawer["text"]) != chunk["sha256"]:
+                # The palace de-duplicates by (url, chunk_index), so when two questions
+                # fetch one URL at different times the second question's manifest records
+                # a sha the palace never stored. The stored text is still verbatim and
+                # still citable; it just is not this question's copy. Drop the chunk and
+                # report it rather than failing the question: an honest, smaller evidence
+                # set beats losing the run. Counted in the manifest under stale_chunks.
+                stale.append({"drawer_id": chunk["drawer_id"], "cite_id": chunk["cite_id"], "url": result["url"]})
                 continue
             chunks.append(
                 {
@@ -298,7 +308,7 @@ def replay(snapshot_id: str, question_id: str, palace: Palace | None = None) -> 
         )
     if missing:
         raise RuntimeError(
-            f"{len(missing)} chunk(s) of {question_id} are missing from the palace or changed: {missing[:3]}"
+            f"{len(missing)} chunk(s) of {question_id} are absent from the palace: {missing[:3]}"
         )
     return {
         "snapshot_id": snapshot_id,
@@ -307,6 +317,7 @@ def replay(snapshot_id: str, question_id: str, palace: Palace | None = None) -> 
         "category": entry["category"],
         "time_range": entry["time_range"],
         "results": results,
+        "stale_chunks": stale,
     }
 
 
@@ -336,7 +347,9 @@ def replay_check(snapshot_id: str, log=print) -> bool:
             try:
                 out = replay(snapshot_id, entry["question_id"], palace=palace)
                 n_chunks = sum(len(r["chunks"]) for r in out["results"])
-                log(f"  {entry['question_id']}: {len(out['results'])} results, {n_chunks} chunks replayed")
+                n_stale = len(out.get("stale_chunks") or [])
+                note = f", {n_stale} stale chunk(s) dropped" if n_stale else ""
+                log(f"  {entry['question_id']}: {len(out['results'])} results, {n_chunks} chunks replayed{note}")
             except Exception as exc:  # noqa: BLE001 - report every failure, then fail once
                 ok = False
                 log(f"  {entry['question_id']}: FAIL {exc}")

@@ -15,6 +15,8 @@ seed is passed per request and recorded on every generation.
 
 from __future__ import annotations
 
+import logging
+import random
 import re
 import time
 from dataclasses import asdict, dataclass
@@ -25,6 +27,12 @@ import httpx
 from harness.config import env, generator_settings
 
 DEFAULT_URL = "http://127.0.0.1:8888/v1"
+RETRY_STATUSES = frozenset({408, 429, 500, 502, 503, 504, 529})
+MAX_RETRIES = 6
+BACKOFF_BASE = 0.5
+BACKOFF_CAP = 30.0
+
+log = logging.getLogger(__name__)
 _CHANNEL_RE = re.compile(r"<\|channel>.*?<channel\|>", re.DOTALL)
 _MARKER_RE = re.compile(r"<\|?channel\|?>|<\|?turn\|?>|<\|think\|>")
 
@@ -97,10 +105,30 @@ def generate(
     own_client = client is None
     client = client or httpx.Client(timeout=timeout)
     started = time.perf_counter()
+    endpoint = base_url(url) + "/completions"
     try:
-        response = client.post(base_url(url) + "/completions", json=body)
-        response.raise_for_status()
-        payload = response.json()
+        # The generator is a local process that reloads models and drops connections.
+        # One blip must not cost an arm that has been running for hours.
+        attempt = 0
+        while True:
+            try:
+                response = client.post(endpoint, json=body)
+                if response.status_code in RETRY_STATUSES and attempt < MAX_RETRIES:
+                    raise httpx.HTTPStatusError(
+                        f"retryable status {response.status_code}", request=response.request, response=response
+                    )
+                response.raise_for_status()
+                payload = response.json()
+                break
+            except (httpx.TransportError, httpx.HTTPStatusError, ValueError) as exc:
+                status = getattr(getattr(exc, "response", None), "status_code", None)
+                retryable = isinstance(exc, (httpx.TransportError, ValueError)) or status in RETRY_STATUSES
+                if not retryable or attempt >= MAX_RETRIES:
+                    raise
+                delay = min(BACKOFF_CAP, BACKOFF_BASE * (2**attempt)) * (0.5 + random.random() / 2)
+                log.warning("generator attempt %d failed (%s); retrying in %.1fs", attempt + 1, exc, delay)
+                time.sleep(delay)
+                attempt += 1
     finally:
         if own_client:
             client.close()

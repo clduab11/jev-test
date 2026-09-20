@@ -609,7 +609,7 @@
     "label": "correct",
     "letter": "A",
     "model": "claude-sonnet-5",
-    "cached": false,
+    "cached": true,
     "reply": "A"
    },
    "claim_support": [
@@ -1290,7 +1290,7 @@
     "label": "correct",
     "letter": "A",
     "model": "claude-sonnet-5",
-    "cached": false,
+    "cached": true,
     "reply": "A"
    },
    "claim_support": [
@@ -1304,7 +1304,7 @@
      "label": "unsupported",
      "model": "claude-sonnet-5",
      "cached": false,
-     "reply": ""
+     "reply": "UNSUPPORTED"
     }
    ]
   },
@@ -1819,7 +1819,7 @@
     "label": "correct",
     "letter": "A",
     "model": "claude-sonnet-5",
-    "cached": false,
+    "cached": true,
     "reply": "A"
    },
    "claim_support": [
@@ -2300,7 +2300,7 @@
     "label": "correct",
     "letter": "A",
     "model": "claude-sonnet-5",
-    "cached": false,
+    "cached": true,
     "reply": "A"
    },
    "claim_support": [
@@ -3022,7 +3022,7 @@
     "label": "correct",
     "letter": "A",
     "model": "claude-sonnet-5",
-    "cached": false,
+    "cached": true,
     "reply": "A"
    },
    "claim_support": [
@@ -3030,7 +3030,7 @@
      "label": "unsupported",
      "model": "claude-sonnet-5",
      "cached": false,
-     "reply": ""
+     "reply": "UNSUPPORTED"
     },
     {
      "label": "supported",
@@ -3592,7 +3592,7 @@
     "label": "correct",
     "letter": "A",
     "model": "claude-sonnet-5",
-    "cached": false,
+    "cached": true,
     "reply": "A"
    },
    "claim_support": [
@@ -4412,7 +4412,7 @@
     "label": "correct",
     "letter": "A",
     "model": "claude-sonnet-5",
-    "cached": false,
+    "cached": true,
     "reply": "A"
    },
    "claim_support": [
@@ -4728,7 +4728,7 @@
     "label": "correct",
     "letter": "A",
     "model": "claude-sonnet-5",
-    "cached": false,
+    "cached": true,
     "reply": "A"
    },
    "claim_support": [
@@ -5311,7 +5311,7 @@
     "label": "correct",
     "letter": "A",
     "model": "claude-sonnet-5",
-    "cached": false,
+    "cached": true,
     "reply": "A"
    },
    "claim_support": [
@@ -5780,7 +5780,7 @@
     "label": "correct",
     "letter": "A",
     "model": "claude-sonnet-5",
-    "cached": false,
+    "cached": true,
     "reply": "A"
    },
    "claim_support": [
@@ -7098,7 +7098,7 @@
     "label": "correct",
     "letter": "A",
     "model": "claude-sonnet-5",
-    "cached": false,
+    "cached": true,
     "reply": "A"
    },
    "claim_support": [
@@ -8058,7 +8058,7 @@
     "label": "correct",
     "letter": "A",
     "model": "claude-sonnet-5",
-    "cached": false,
+    "cached": true,
     "reply": "A"
    },
    "claim_support": [
@@ -8510,7 +8510,7 @@
     "label": "correct",
     "letter": "A",
     "model": "claude-sonnet-5",
-    "cached": false,
+    "cached": true,
     "reply": "A"
    },
    "claim_support": [
@@ -9262,7 +9262,7 @@
     "label": "correct",
     "letter": "A",
     "model": "claude-sonnet-5",
-    "cached": false,
+    "cached": true,
     "reply": "A"
    },
    "claim_support": [
@@ -9306,12 +9306,14 @@
    "resamples": 1000,
    "seed": 20260919
   },
+  "ungraded": 0,
   "grader_model": "claude-sonnet-5",
-  "graded_at": "2026-09-19T18:52:51Z",
+  "graded_at": "2026-09-20T16:26:14Z",
   "fabricated_citations_total": 0,
   "claim_support": {
    "kept_claims": 22,
    "supported": 20,
+   "unreadable": 0,
    "rate": 0.9090909090909091,
    "n_questions": 20,
    "n_questions_with_claims": 15,

@@ -22,7 +22,29 @@ def test_parse_label_checks_the_negative_first():
     assert claim_support.parse_label("SUPPORTED") == "supported"
     assert claim_support.parse_label("UNSUPPORTED") == "unsupported"
     assert claim_support.parse_label("Not supported.") == "unsupported"
-    assert claim_support.parse_label("") == "unsupported"
+
+
+def test_an_unreadable_reply_is_not_a_negative_verdict():
+    """The bug this pins cost the project a wrong headline number.
+
+    The grader ran with max_tokens=8, every reply hit the cap, and ten came back
+    empty. parse_label scored each of them "unsupported", which is how a truncated
+    reply became the only source of negative citation-support verdicts in both
+    pilots. An unreadable reply is now its own label and is excluded from the rate.
+    """
+    assert claim_support.parse_label("") == claim_support.UNREADABLE
+    assert claim_support.parse_label("   \n ") == claim_support.UNREADABLE
+    assert claim_support.parse_label("Let me think about this") == claim_support.UNREADABLE
+    assert claim_support.GRADER_MAX_TOKENS >= 16, "8 tokens truncated the verdict itself"
+
+
+def test_unreadable_claims_leave_the_rate_rather_than_lowering_it():
+    both_ways = [["supported", claim_support.UNREADABLE], ["supported"]]
+    out = claim_support.support_rate(both_ways)
+    assert out["kept_claims"] == 2, "the unreadable claim is not counted as graded"
+    assert out["supported"] == 2
+    assert out["rate"] == 1.0, "an unreadable reply must not drag the rate down"
+    assert out["unreadable"] == 1, "but it is reported, never hidden"
 
 
 def test_claim_evidence_uses_the_record_texts():

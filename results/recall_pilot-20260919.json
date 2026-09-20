@@ -1,0 +1,233 @@
+{
+ "snapshot": "pilot-20260919",
+ "n": 20,
+ "recall": 0.85,
+ "recall_in_chunks": 0.85,
+ "recall_top8_pages": 0.75,
+ "recall_long_answers_only": 0.75,
+ "n_short_answers": 8,
+ "n_zero_chunk_questions": 0,
+ "mean_results": 28.7,
+ "per_question": [
+  {
+   "question_id": "simpleqa-0031",
+   "gold": "150",
+   "n_results": 30,
+   "n_chunks": 102,
+   "in_any_evidence": true,
+   "in_chunks": true,
+   "in_snippets_only": false,
+   "in_top8_pages": true,
+   "short_answer": true
+  },
+  {
+   "question_id": "simpleqa-0184",
+   "gold": "Dr Upendra Kaul",
+   "n_results": 30,
+   "n_chunks": 158,
+   "in_any_evidence": true,
+   "in_chunks": true,
+   "in_snippets_only": false,
+   "in_top8_pages": true,
+   "short_answer": false
+  },
+  {
+   "question_id": "simpleqa-0192",
+   "gold": "1957",
+   "n_results": 30,
+   "n_chunks": 98,
+   "in_any_evidence": true,
+   "in_chunks": true,
+   "in_snippets_only": false,
+   "in_top8_pages": true,
+   "short_answer": true
+  },
+  {
+   "question_id": "simpleqa-0297",
+   "gold": "Deidre Lang",
+   "n_results": 30,
+   "n_chunks": 135,
+   "in_any_evidence": true,
+   "in_chunks": true,
+   "in_snippets_only": false,
+   "in_top8_pages": true,
+   "short_answer": false
+  },
+  {
+   "question_id": "simpleqa-0454",
+   "gold": "Anna Negri, Nina Negri",
+   "n_results": 30,
+   "n_chunks": 102,
+   "in_any_evidence": false,
+   "in_chunks": false,
+   "in_snippets_only": false,
+   "in_top8_pages": false,
+   "short_answer": false
+  },
+  {
+   "question_id": "simpleqa-0512",
+   "gold": "1916",
+   "n_results": 30,
+   "n_chunks": 110,
+   "in_any_evidence": true,
+   "in_chunks": true,
+   "in_snippets_only": false,
+   "in_top8_pages": true,
+   "short_answer": true
+  },
+  {
+   "question_id": "simpleqa-0761",
+   "gold": "4 years.",
+   "n_results": 30,
+   "n_chunks": 149,
+   "in_any_evidence": false,
+   "in_chunks": false,
+   "in_snippets_only": false,
+   "in_top8_pages": false,
+   "short_answer": false
+  },
+  {
+   "question_id": "simpleqa-0805",
+   "gold": "Kindly accept my respectful obeisances.",
+   "n_results": 29,
+   "n_chunks": 123,
+   "in_any_evidence": true,
+   "in_chunks": true,
+   "in_snippets_only": false,
+   "in_top8_pages": true,
+   "short_answer": false
+  },
+  {
+   "question_id": "simpleqa-1142",
+   "gold": "3rd",
+   "n_results": 30,
+   "n_chunks": 140,
+   "in_any_evidence": true,
+   "in_chunks": true,
+   "in_snippets_only": false,
+   "in_top8_pages": true,
+   "short_answer": true
+  },
+  {
+   "question_id": "simpleqa-1359",
+   "gold": "December 31, 2008",
+   "n_results": 30,
+   "n_chunks": 113,
+   "in_any_evidence": true,
+   "in_chunks": true,
+   "in_snippets_only": false,
+   "in_top8_pages": false,
+   "short_answer": false
+  },
+  {
+   "question_id": "simpleqa-1892",
+   "gold": "Wavertree Technology Park",
+   "n_results": 30,
+   "n_chunks": 160,
+   "in_any_evidence": true,
+   "in_chunks": true,
+   "in_snippets_only": false,
+   "in_top8_pages": true,
+   "short_answer": false
+  },
+  {
+   "question_id": "simpleqa-2191",
+   "gold": "31 August 1944",
+   "n_results": 29,
+   "n_chunks": 81,
+   "in_any_evidence": true,
+   "in_chunks": true,
+   "in_snippets_only": false,
+   "in_top8_pages": true,
+   "short_answer": false
+  },
+  {
+   "question_id": "simpleqa-2295",
+   "gold": "1949",
+   "n_results": 30,
+   "n_chunks": 79,
+   "in_any_evidence": true,
+   "in_chunks": true,
+   "in_snippets_only": false,
+   "in_top8_pages": false,
+   "short_answer": true
+  },
+  {
+   "question_id": "simpleqa-2605",
+   "gold": "Nocturne (A Moon Landing)",
+   "n_results": 30,
+   "n_chunks": 127,
+   "in_any_evidence": true,
+   "in_chunks": true,
+   "in_snippets_only": false,
+   "in_top8_pages": true,
+   "short_answer": false
+  },
+  {
+   "question_id": "simpleqa-2773",
+   "gold": "Sabrina Costelana",
+   "n_results": 30,
+   "n_chunks": 158,
+   "in_any_evidence": true,
+   "in_chunks": true,
+   "in_snippets_only": false,
+   "in_top8_pages": true,
+   "short_answer": false
+  },
+  {
+   "question_id": "simpleqa-2875",
+   "gold": "December 1972",
+   "n_results": 30,
+   "n_chunks": 118,
+   "in_any_evidence": true,
+   "in_chunks": true,
+   "in_snippets_only": false,
+   "in_top8_pages": true,
+   "short_answer": false
+  },
+  {
+   "question_id": "simpleqa-3140",
+   "gold": "1952",
+   "n_results": 28,
+   "n_chunks": 95,
+   "in_any_evidence": true,
+   "in_chunks": true,
+   "in_snippets_only": false,
+   "in_top8_pages": true,
+   "short_answer": true
+  },
+  {
+   "question_id": "simpleqa-3295",
+   "gold": "1999",
+   "n_results": 28,
+   "n_chunks": 82,
+   "in_any_evidence": true,
+   "in_chunks": true,
+   "in_snippets_only": false,
+   "in_top8_pages": true,
+   "short_answer": true
+  },
+  {
+   "question_id": "simpleqa-3506",
+   "gold": "Arsenal and Manchester United",
+   "n_results": 29,
+   "n_chunks": 138,
+   "in_any_evidence": false,
+   "in_chunks": false,
+   "in_snippets_only": false,
+   "in_top8_pages": false,
+   "short_answer": false
+  },
+  {
+   "question_id": "simpleqa-4095",
+   "gold": "307",
+   "n_results": 11,
+   "n_chunks": 57,
+   "in_any_evidence": true,
+   "in_chunks": true,
+   "in_snippets_only": false,
+   "in_top8_pages": true,
+   "short_answer": true
+  }
+ ]
+}

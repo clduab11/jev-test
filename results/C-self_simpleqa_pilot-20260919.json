@@ -555,7 +555,7 @@
     "label": "correct",
     "letter": "A",
     "model": "claude-sonnet-5",
-    "cached": false,
+    "cached": true,
     "reply": "A"
    },
    "claim_support": [
@@ -1105,7 +1105,7 @@
     "label": "incorrect",
     "letter": "B",
     "model": "claude-sonnet-5",
-    "cached": false,
+    "cached": true,
     "reply": "B"
    },
    "claim_support": [
@@ -1627,7 +1627,28 @@
    },
    "generator_s": 5.936,
    "latency_s": 431.445,
-   "wall_s": 431.592
+   "wall_s": 431.592,
+   "grade": {
+    "label": "correct",
+    "letter": "A",
+    "model": "claude-sonnet-5",
+    "cached": true,
+    "reply": "A"
+   },
+   "claim_support": [
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    },
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": true,
+     "reply": "SUPPORTED"
+    }
+   ]
   },
   {
    "question_id": "simpleqa-0297",
@@ -2146,7 +2167,22 @@
    },
    "generator_s": 0.559,
    "latency_s": 471.3,
-   "wall_s": 471.345
+   "wall_s": 471.345,
+   "grade": {
+    "label": "correct",
+    "letter": "A",
+    "model": "claude-sonnet-5",
+    "cached": true,
+    "reply": "A"
+   },
+   "claim_support": [
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    }
+   ]
   },
   {
    "question_id": "simpleqa-0454",
@@ -2596,7 +2632,22 @@
    },
    "generator_s": 0.516,
    "latency_s": 202.047,
-   "wall_s": 202.084
+   "wall_s": 202.084,
+   "grade": {
+    "label": "incorrect",
+    "letter": "B",
+    "model": "claude-sonnet-5",
+    "cached": true,
+    "reply": "B"
+   },
+   "claim_support": [
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    }
+   ]
   },
   {
    "question_id": "simpleqa-0512",
@@ -3169,7 +3220,34 @@
    },
    "generator_s": 6.024,
    "latency_s": 264.034,
-   "wall_s": 264.25
+   "wall_s": 264.25,
+   "grade": {
+    "label": "correct",
+    "letter": "A",
+    "model": "claude-sonnet-5",
+    "cached": true,
+    "reply": "A"
+   },
+   "claim_support": [
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    },
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    },
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    }
+   ]
   },
   {
    "question_id": "simpleqa-0761",
@@ -3771,7 +3849,34 @@
    },
    "generator_s": 0.723,
    "latency_s": 317.413,
-   "wall_s": 317.474
+   "wall_s": 317.474,
+   "grade": {
+    "label": "correct",
+    "letter": "A",
+    "model": "claude-sonnet-5",
+    "cached": true,
+    "reply": "A"
+   },
+   "claim_support": [
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    },
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    },
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    }
+   ]
   },
   {
    "question_id": "simpleqa-0805",
@@ -4292,7 +4397,16 @@
    },
    "generator_s": 1.329,
    "latency_s": 251.656,
-   "wall_s": 251.698
+   "wall_s": 251.698,
+   "grade": {
+    "label": "not_attempted",
+    "letter": "C",
+    "model": "claude-sonnet-5",
+    "cached": false,
+    "reply": "",
+    "skipped": "empty answer"
+   },
+   "claim_support": []
   },
   {
    "question_id": "simpleqa-1142",
@@ -4699,7 +4813,16 @@
    },
    "generator_s": 0.204,
    "latency_s": 274.847,
-   "wall_s": 274.887
+   "wall_s": 274.887,
+   "grade": {
+    "label": "not_attempted",
+    "letter": "C",
+    "model": "claude-sonnet-5",
+    "cached": false,
+    "reply": "",
+    "skipped": "empty answer"
+   },
+   "claim_support": []
   },
   {
    "question_id": "simpleqa-1359",
@@ -5157,7 +5280,22 @@
    },
    "generator_s": 0.773,
    "latency_s": 194.203,
-   "wall_s": 194.297
+   "wall_s": 194.297,
+   "grade": {
+    "label": "not_attempted",
+    "letter": "C",
+    "model": "claude-sonnet-5",
+    "cached": true,
+    "reply": "C"
+   },
+   "claim_support": [
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    }
+   ]
   },
   {
    "question_id": "simpleqa-1892",
@@ -5766,7 +5904,28 @@
    },
    "generator_s": 1.058,
    "latency_s": 289.041,
-   "wall_s": 289.158
+   "wall_s": 289.158,
+   "grade": {
+    "label": "correct",
+    "letter": "A",
+    "model": "claude-sonnet-5",
+    "cached": true,
+    "reply": "A"
+   },
+   "claim_support": [
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    },
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    }
+   ]
   },
   {
    "question_id": "simpleqa-2191",
@@ -6206,7 +6365,22 @@
    },
    "generator_s": 5.508,
    "latency_s": 167.937,
-   "wall_s": 167.98
+   "wall_s": 167.98,
+   "grade": {
+    "label": "correct",
+    "letter": "A",
+    "model": "claude-sonnet-5",
+    "cached": true,
+    "reply": "A"
+   },
+   "claim_support": [
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    }
+   ]
   },
   {
    "question_id": "simpleqa-2295",
@@ -6684,7 +6858,28 @@
    },
    "generator_s": 5.812,
    "latency_s": 270.804,
-   "wall_s": 270.962
+   "wall_s": 270.962,
+   "grade": {
+    "label": "incorrect",
+    "letter": "B",
+    "model": "claude-sonnet-5",
+    "cached": true,
+    "reply": "B"
+   },
+   "claim_support": [
+    {
+     "label": "unsupported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "UNSUPPORTED"
+    },
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    }
+   ]
   },
   {
    "question_id": "simpleqa-2605",
@@ -7295,7 +7490,28 @@
    },
    "generator_s": 1.201,
    "latency_s": 358.226,
-   "wall_s": 358.326
+   "wall_s": 358.326,
+   "grade": {
+    "label": "correct",
+    "letter": "A",
+    "model": "claude-sonnet-5",
+    "cached": true,
+    "reply": "A"
+   },
+   "claim_support": [
+    {
+     "label": "unsupported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "UNSUPPORTED"
+    },
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    }
+   ]
   },
   {
    "question_id": "simpleqa-2773",
@@ -7803,7 +8019,16 @@
    },
    "generator_s": 0.352,
    "latency_s": 567.721,
-   "wall_s": 567.792
+   "wall_s": 567.792,
+   "grade": {
+    "label": "not_attempted",
+    "letter": "C",
+    "model": "claude-sonnet-5",
+    "cached": false,
+    "reply": "",
+    "skipped": "empty answer"
+   },
+   "claim_support": []
   },
   {
    "question_id": "simpleqa-2875",
@@ -8354,7 +8579,22 @@
    },
    "generator_s": 0.884,
    "latency_s": 358.588,
-   "wall_s": 358.683
+   "wall_s": 358.683,
+   "grade": {
+    "label": "correct",
+    "letter": "A",
+    "model": "claude-sonnet-5",
+    "cached": true,
+    "reply": "A"
+   },
+   "claim_support": [
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": true,
+     "reply": "SUPPORTED"
+    }
+   ]
   },
   {
    "question_id": "simpleqa-3140",
@@ -8803,7 +9043,28 @@
    },
    "generator_s": 0.788,
    "latency_s": 287.038,
-   "wall_s": 287.13
+   "wall_s": 287.13,
+   "grade": {
+    "label": "correct",
+    "letter": "A",
+    "model": "claude-sonnet-5",
+    "cached": true,
+    "reply": "A"
+   },
+   "claim_support": [
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": true,
+     "reply": "SUPPORTED"
+    },
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": true,
+     "reply": "SUPPORTED"
+    }
+   ]
   },
   {
    "question_id": "simpleqa-3295",
@@ -9221,7 +9482,22 @@
    },
    "generator_s": 0.476,
    "latency_s": 241.73,
-   "wall_s": 241.775
+   "wall_s": 241.775,
+   "grade": {
+    "label": "correct",
+    "letter": "A",
+    "model": "claude-sonnet-5",
+    "cached": true,
+    "reply": "A"
+   },
+   "claim_support": [
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    }
+   ]
   },
   {
    "question_id": "simpleqa-3506",
@@ -9686,7 +9962,16 @@
    },
    "generator_s": 6.033,
    "latency_s": 251.218,
-   "wall_s": 251.259
+   "wall_s": 251.259,
+   "grade": {
+    "label": "not_attempted",
+    "letter": "C",
+    "model": "claude-sonnet-5",
+    "cached": false,
+    "reply": "",
+    "skipped": "empty answer"
+   },
+   "claim_support": []
   },
   {
    "question_id": "simpleqa-4095",
@@ -10272,7 +10557,80 @@
    },
    "generator_s": 1.179,
    "latency_s": 261.349,
-   "wall_s": 261.419
+   "wall_s": 261.419,
+   "grade": {
+    "label": "correct",
+    "letter": "A",
+    "model": "claude-sonnet-5",
+    "cached": true,
+    "reply": "A"
+   },
+   "claim_support": [
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": true,
+     "reply": "SUPPORTED"
+    },
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    },
+    {
+     "label": "supported",
+     "model": "claude-sonnet-5",
+     "cached": false,
+     "reply": "SUPPORTED"
+    }
+   ]
   }
- ]
+ ],
+ "metrics": {
+  "n": 20,
+  "correct": 12,
+  "incorrect": 3,
+  "not_attempted": 5,
+  "attempted": 15,
+  "truthfulness": 0.45,
+  "hallucination_rate": 0.2,
+  "coverage": 0.75,
+  "truthfulness_ci": [
+   0.1,
+   0.75
+  ],
+  "hallucination_rate_ci": [
+   0.0,
+   0.4288
+  ],
+  "coverage_ci": [
+   0.55,
+   0.95
+  ],
+  "bootstrap": {
+   "resamples": 1000,
+   "seed": 20260919
+  },
+  "ungraded": 0,
+  "grader_model": "claude-sonnet-5",
+  "graded_at": "2026-09-20T16:26:22Z",
+  "fabricated_citations_total": 0,
+  "claim_support": {
+   "kept_claims": 27,
+   "supported": 25,
+   "unreadable": 0,
+   "rate": 0.9259259259259259,
+   "n_questions": 20,
+   "n_questions_with_claims": 16,
+   "rate_ci": [
+    0.8182,
+    1.0
+   ],
+   "bootstrap": {
+    "resamples": 1000,
+    "seed": 20260919
+   }
+  }
+ }
 }

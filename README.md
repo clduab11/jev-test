@@ -138,29 +138,52 @@ Twenty SimpleQA questions were drawn with a fixed seed, their search results and
 |---|---|---|---|---|---|---|
 | A, generator alone | 0 | 6 | 14 | -0.30 [-0.50, -0.10] | 1.00 [1.00, 1.00] | 0.30 [0.10, 0.50] |
 | B, naive search, top 8 pages | 12 | 4 | 4 | 0.40 [0.05, 0.75] | 0.25 [0.06, 0.47] | 0.80 [0.60, 0.95] |
+| C-self, small model judges itself | 12 | 3 | 5 | 0.45 [0.10, 0.75] | 0.20 [0.00, 0.43] | 0.75 [0.55, 0.95] |
 | D, Jev decides | 15 | 0 | 5 | 0.75 [0.55, 0.95] | 0.00 [0.00, 0.00] | 0.75 [0.55, 0.95] |
+
+The ceiling for all of them is 0.850. That is the share of these questions whose answer appears anywhere in the frozen pages, measured offline by string match and reported by `harness/grading/recall.py`. No version can answer a question whose answer was never retrieved.
 
 Findings from the pilot, each one checkable in `results/`:
 
 1. With Jev deciding, the small model got 15 of 20 right and none wrong. The same model with the same search results and no judge got 12 right and 4 wrong. Without search it got none right.
-2. The judged version declined 5 questions and wrote down why each time: twice the evidence was not enough after a second search, once every sentence of the draft failed verification, and twice the verified answer was about a neighbouring question (a year for the wrong event; a description of an artwork instead of its title).
+2. The judged version declined 5 questions and wrote down why each time: twice the evidence was not enough after a second search, once every sentence of the draft failed verification, and twice the verified answer was about a neighbouring question.
 3. Verification did real work. Of the 31 cited sentences the small model wrote, 9 were removed before shipping, six of them because the judge's confidence was below 0.80. An outside grader then checked the 22 that shipped and agreed with 20.
 4. The small model invented no citation ids when the judge chose the evidence. The unjudged version invented two on the same questions.
 5. The second search rescued one question. The first pass had judged the right page's snippet off topic; the new query surfaced that page's own text from the frozen set, and it went to the top of the ranking.
 6. Cost: 49 judge requests and about 42,000 judge tokens per question, 3.5 cents for the whole pilot at list price, five seconds per question on a laptop.
-7. Early, on two questions only: when the small model judged itself with the same questions (version C-self), it took four to eight minutes per question, returned probabilities of exactly 0 or 1, and shipped a wrong answer as supported with confidence 1.0. The full 20-question run of that version is queued.
-8. Practical: a home SearXNG loses most of its engines after a few dozen queries. Of the first 286 questions of the 500-question freeze, none got the thirty results the design assumes and 44 got none; only DuckDuckGo kept answering, with Startpage back later. The freeze now paces itself and re-searches short questions when engines return.
+7. Letting the small model judge itself does not work, and the reason is measurable. See below.
+8. Two decisions the judge got wrong cost real answers. On one question it found the correct sentence, rated it supported at 0.76, and the 0.80 gate stripped it. On another it kept a correct fact and then decided the answer did not address the question. Both became declines. The gate is not free.
 
-Against the four bars, on this pilot only:
+### The ablation: what a calibrated judge actually buys
 
-| Measure | Bar | Pilot value |
-|---|---|---|
-| Share of questions attempted | at least 0.50 | 0.75 |
-| Share of attempted answers that are wrong | at most 0.10 | 0.00 |
-| Improvement in the main score over version B | at least 0.15 | 0.35 |
-| Share of kept sentences the grader also finds supported | at least 0.90 | 0.91 (20 of 22) |
+Version C-self runs the identical pipeline with identical questions and thresholds. Only the judge changes: the small model answers the typed questions about its own work instead of Jev. It scored 0.45 against naive search at 0.40 and the judged pipeline at 0.75. It sits next to the version with no judge at all.
 
-What this does not show yet: twenty questions give wide intervals, and fifteen attempts with no wrong answer is consistent with a true error rate as high as one in five. The 500-question run is in progress. Its numbers replace these when it finishes, and they will carry the recall of the frozen search results alongside, because a snapshot with ten results per question cannot be compared with one that has thirty.
+The reason is not that it judges badly. It is that it cannot express a degree of belief. Across 31 verdicts its confidence took exactly two values, 1.00 thirty times and 0.25 once. Jev's 33 verdicts took 17 distinct values between 0.37 and 1.00.
+
+That makes every threshold in the design inert. Sweeping the confidence gate across its whole range and counting the sentences that survive:
+
+| Gate setting | 0.00 | 0.40 | 0.60 | 0.80 | 0.90 | 1.00 |
+|---|---|---|---|---|---|---|
+| Sentences kept, C-self | 27 | 27 | 27 | 27 | 27 | 27 |
+| Sentences kept, D | 30 | 29 | 26 | 24 | 21 | 10 |
+
+C-self ships the same answer at every setting. The 0.80 gate removed 6 of Jev's 30 supported verdicts and 0 of C-self's 27. A model whose output is always 0 or 1 can never land between two thresholds, so the gate is decorative.
+
+What does survive is the structure. C-self still declined 5 questions, still stripped 4 sentences on the verdict label, never on the confidence, and still invented no citations. So decomposing the work into typed questions helps any model. Calibration is the part you cannot get from the small model, and it is worth 0.30 on this pilot.
+
+One trap the numbers set: C-self's citation support is 0.926, slightly above Jev's 0.909. Its sentences are faithful to what they cite. They are just answers to the wrong question. Faithfulness is not correctness, and a citation-support score on its own will flatter a model that cites carefully and reasons poorly.
+
+### We broke our own measurement, and here is how
+
+The citation-support number above was wrong until 2026-09-20. The grader ran with an 8-token output cap. The grading model deliberates for about 120 tokens before emitting its one-word verdict, so every reply came back empty, and the parser scored an unreadable reply as "unsupported". Every negative citation-support verdict this project ever produced was a truncation. Not one call had ever returned the word.
+
+Raising the cap and re-grading moved C-self from 0.704 to 0.926 and left Jev's 0.909 unchanged. An unreadable reply is now its own label, excluded from the rate and never counted against it, and `tests/test_claim_support.py` pins that. The other three measures never used that path and did not move.
+
+### What this does not show
+
+Twenty questions give wide intervals. Fifteen attempts with no wrong answer is consistent with a true error rate as high as one in five. The 500-question run is in progress and its numbers replace these.
+
+That run also has a thinner snapshot, and the disclosure belongs here before its numbers exist, never afterwards. The home search instance lost most of its engines to rate limits and CAPTCHAs while the pages were being frozen, so the 500 questions average 10.7 search results each against the pilot's 28.7, and 17 have no fetched text at all. Two things follow. The gold answer is still present in the frozen pages for 85.0 percent of questions, exactly as in the pilot, because the results that went missing were ranks 9 to 30 and those rarely held the only copy. But the judged version fetches at most 5 pages out of the survivors of its gate, and with a third as many candidates it will have fewer to choose from, so its share of questions attempted should fall. The naive version reads the top 8 pages and never looked past them, so it loses almost nothing. The thin snapshot is mildly kind to the version we are trying to beat.
 
 ## What leaves your computer
 

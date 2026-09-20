@@ -87,7 +87,9 @@ def _payload(
     memory_path: Path | None,
     memory_palace,
     complete: bool,
+    manifest_stamp: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    manifest_stamp = manifest_stamp or {}
     payload: dict[str, Any] = {
         "arm": arm,
         "dataset": dataset,
@@ -101,6 +103,11 @@ def _payload(
         "n": len(records),
         "complete": complete,
         "created_at": _now(),
+        # Identity of the evidence these answers were produced against. A re-search
+        # rewrites the manifest, and records answered against the old evidence must not
+        # be silently mixed into one metrics block with records answered against the new.
+        "manifest_updated_at": manifest_stamp.get("updated_at"),
+        "palace_drawers": manifest_stamp.get("palace_drawers"),
     }
     if judge is not None:
         totals = {"n_requests": 0, "n_cached": 0, "input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0}
@@ -129,6 +136,15 @@ def _write(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".json.tmp")
     tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
+    # A reader holding the file open makes replace fail on Windows. That is the exact
+    # failure that killed this project's freeze at question 236, and a 5-hour arm run
+    # must not die because someone looked at its progress.
+    for attempt in range(20):
+        try:
+            tmp.replace(path)
+            return
+        except PermissionError:
+            time.sleep(0.25 * (attempt + 1))
     tmp.replace(path)
 
 
@@ -153,12 +169,21 @@ def run_arm(
     today = str(manifest.get("created_at", ""))[:10] or time.strftime("%Y-%m-%d", time.gmtime())
     path = results_path(out_dir, arm, dataset, snapshot)
 
+    stamp = {"updated_at": manifest.get("updated_at"), "palace_drawers": manifest.get("palace_drawers")}
+
     done: dict[str, dict[str, Any]] = {}
     if resume and path.exists():
         prior = json.loads(path.read_text(encoding="utf-8"))
         wanted = set(question_ids)
-        done = {r["question_id"]: r for r in prior.get("records", []) if r.get("question_id") in wanted}
-        log(f"resuming {path.name}: {len(done)} of {len(question_ids)} questions already answered")
+        prior_stamp = prior.get("manifest_updated_at")
+        if prior_stamp is not None and prior_stamp != stamp["updated_at"]:
+            log(
+                f"discarding {len(prior.get('records', []))} prior record(s): they were answered against "
+                f"manifest {prior_stamp}, the snapshot on disk is now {stamp['updated_at']}"
+            )
+        else:
+            done = {r["question_id"]: r for r in prior.get("records", []) if r.get("question_id") in wanted}
+            log(f"resuming {path.name}: {len(done)} of {len(question_ids)} questions already answered")
 
     judge = None
     memory_palace = None
@@ -173,28 +198,28 @@ def run_arm(
         judge_url = env("JEV_BASE_URL") if arm == "D" else env("LLAMA_SERVER_URL")
         log(f"judge {judge.model} at {judge_url}; memory palace {memory_path} ({memory_palace.count()} drawers)")
 
-    records: list[dict[str, Any]] = []
-    answered_now = 0
-    for index, qid in enumerate(question_ids, 1):
-        if qid in done:
-            records.append(done[qid])
-            continue
+    def answer_one(qid: str) -> dict[str, Any]:
+        """One question through this arm. Raises only on a real failure.
+
+        Chunks the palace could not serve verbatim are carried onto the record as
+        ``stale_chunks`` so a thinner evidence set is visible in the results file
+        rather than silently absorbed.
+        """
         row = rows[qid]
-        started = time.perf_counter()
         if arm == "A":
             from harness.arms import a_plain
 
-            record = a_plain.answer(row["query"], seed=seed)
-        elif arm == "B":
+            return a_plain.answer(row["query"], seed=seed)
+        replayed = replay(snapshot, qid, palace=palace)
+        stale = replayed.get("stale_chunks") or []
+        if arm == "B":
             from harness.arms import b_naive
 
-            replayed = replay(snapshot, qid, palace=palace)
             record = b_naive.answer(row["query"], replayed, seed=seed)
         elif arm in JUDGED_ARMS:
             from harness.arms import c_self, d_jev
 
             module = d_jev if arm == "D" else c_self
-            replayed = replay(snapshot, qid, palace=palace)
             record = module.answer(
                 row["query"],
                 qid,
@@ -207,7 +232,33 @@ def run_arm(
             )
         else:
             raise ValueError(f"arm {arm!r} is not implemented yet")
-        record = {"question_id": qid, "query": row["query"], "gold": row["gold"], **record}
+        if stale:
+            record["stale_chunks"] = stale
+        return record
+
+    records: list[dict[str, Any]] = []
+    answered_now = 0
+    for index, qid in enumerate(question_ids, 1):
+        if qid in done:
+            records.append(done[qid])
+            continue
+        started = time.perf_counter()
+        try:
+            record = answer_one(qid)
+        except BaseException as exc:
+            # Never let one question cost the hours already spent. Checkpoint what is
+            # answered, name the question, and re-raise: a crash is an infrastructure
+            # failure and must not be silently recorded as the system declining to
+            # answer, which would inflate coverage. Resume continues from here.
+            if answered_now:
+                _write(
+                    path,
+                    _payload(arm, dataset, snapshot, seed, today, records, judge, memory_path, memory_palace, complete=False, manifest_stamp=stamp),
+                )
+                log(f"checkpointed {len(records)} record(s) to {path.name} before failing")
+            log(f"FAILED on {qid} ({index}/{len(question_ids)}): {type(exc).__name__}: {exc}")
+            raise
+        record = {"question_id": qid, "query": rows[qid]["query"], "gold": rows[qid]["gold"], **record}
         record["wall_s"] = round(time.perf_counter() - started, 3)
         records.append(record)
         answered_now += 1
@@ -218,11 +269,14 @@ def run_arm(
             extra = f", {j['n_requests']} judge requests ({j['n_cached']} cached), ${j['cost_usd']:.4f}"
         if record.get("abstained") and record.get("abstain_reason"):
             preview += f" ({record['abstain_reason']})"
+        stale = len(record.get("stale_chunks") or [])
+        if stale:
+            extra += f", {stale} stale chunk(s) dropped"
         log(f"[{index}/{len(question_ids)}] {qid} ({record['wall_s']:.1f}s{extra}): {preview}")
-        if answered_now % CHECKPOINT_EVERY == 0:
-            _write(path, _payload(arm, dataset, snapshot, seed, today, records, judge, memory_path, memory_palace, complete=False))
+        if answered_now == 1 or answered_now % CHECKPOINT_EVERY == 0:
+            _write(path, _payload(arm, dataset, snapshot, seed, today, records, judge, memory_path, memory_palace, complete=False, manifest_stamp=stamp))
 
-    payload = _payload(arm, dataset, snapshot, seed, today, records, judge, memory_path, memory_palace, complete=True)
+    payload = _payload(arm, dataset, snapshot, seed, today, records, judge, memory_path, memory_palace, complete=True, manifest_stamp=stamp)
     _write(path, payload)
     log(f"wrote {path} ({len(records)} records, {answered_now} answered in this run)")
     if judge is not None:
@@ -245,8 +299,12 @@ def grade_file(path: Path, model: str | None = None, log=print) -> dict[str, Any
     grades = grader.grade_records(payload["records"], model=model)
     for record, grade in zip(payload["records"], grades, strict=True):
         record["grade"] = grade
-    labels = [g["label"] for g in grades]
+    labels = [g["label"] for g in grades if g.get("label")]
+    ungraded = len(grades) - len(labels)
+    if ungraded:
+        log(f"  WARNING: {ungraded} record(s) could not be graded and are excluded from the metrics")
     metrics = crag_score.bootstrap(labels)
+    metrics["ungraded"] = ungraded
     metrics["grader_model"] = next((g["model"] for g in grades if g.get("model")), model or env("GRADER_MODEL"))
     metrics["graded_at"] = _now()
     metrics["fabricated_citations_total"] = sum(int(r.get("fabricated_citations") or 0) for r in payload["records"])
@@ -262,7 +320,8 @@ def grade_file(path: Path, model: str | None = None, log=print) -> dict[str, Any
     log(f"graded {path.name}: {metrics['correct']} correct, {metrics['incorrect']} incorrect, {metrics['not_attempted']} not attempted (grader {metrics['grader_model']})")
     if "claim_support" in metrics:
         cs = metrics["claim_support"]
-        log(f"  citation support: {cs['supported']} of {cs['kept_claims']} kept claims supported by the grader")
+        note = f", {cs['unreadable']} unreadable and excluded" if cs.get("unreadable") else ""
+        log(f"  citation support: {cs['supported']} of {cs['kept_claims']} kept claims supported by the grader{note}")
     return payload
 
 

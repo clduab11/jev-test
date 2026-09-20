@@ -10,7 +10,10 @@ Rules from docs/JUDGMENT_SPEC.md that this module enforces:
   * the responding ``model`` id is stored with every answer set
   * the model id must be a pinned version, never a ``*-latest`` alias
   * 429, 5xx and 529 are retried with exponential backoff and honour Retry-After;
-    any other 4xx raises immediately with the server's message
+    any other 4xx raises immediately with the server's message. The default budget
+    of ten attempts capped at sixty seconds covers a multi-minute endpoint restart,
+    because one unlucky request among arm D's twenty-five thousand must not end a
+    five-hour run.
 """
 
 from __future__ import annotations
@@ -74,9 +77,9 @@ class HttpJudge:
         cache_dir: str | os.PathLike[str] = "json_cache",
         timeout: float = 60.0,
         max_workers: int = 4,
-        max_retries: int = 6,
+        max_retries: int = 10,
         backoff_base: float = 0.5,
-        backoff_cap: float = 30.0,
+        backoff_cap: float = 60.0,
         extra_headers: Mapping[str, str] | None = None,
         transport: httpx.BaseTransport | None = None,
         sleep: Callable[[float], None] = time.sleep,
