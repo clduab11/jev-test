@@ -35,7 +35,7 @@ import time
 from pathlib import Path
 from typing import Any
 
-from harness.config import ROOT, env, load_env, spec_version, thresholds
+from harness.config import ROOT, configure_stdout, env, load_env, spec_version, thresholds
 from harness.grading import crag_score
 
 ARMS = ("A", "B", "D", "C-self")
@@ -297,6 +297,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--grader-model", default=None)
     args = parser.parse_args(argv)
 
+    configure_stdout()
     load_env()
     out_dir = Path(args.out) if Path(args.out).is_absolute() else ROOT / args.out
     seed = args.seed if args.seed is not None else int(env("GENERATOR_SEED", "20260919") or 20260919)

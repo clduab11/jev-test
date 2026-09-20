@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
@@ -42,11 +43,20 @@ def log(message: str) -> None:
         handle.write(line + "\n")
 
 
+def child_env() -> dict[str, str]:
+    """UTF-8 in every child, whatever the machine's locale codec is."""
+    env = dict(os.environ)
+    env["PYTHONIOENCODING"] = "utf-8"
+    env["PYTHONUTF8"] = "1"
+    return env
+
+
 def run(args: list[str]) -> int:
     log("run: " + " ".join(args))
     with LOG.open("a", encoding="utf-8") as handle:
         process = subprocess.run(
-            [sys.executable, *args], cwd=ROOT, stdout=handle, stderr=subprocess.STDOUT, text=True, check=False
+            [sys.executable, *args], cwd=ROOT, stdout=handle, stderr=subprocess.STDOUT,
+            text=True, check=False, env=child_env(),
         )
     log(f"exit {process.returncode}")
     return process.returncode

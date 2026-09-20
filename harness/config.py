@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from functools import lru_cache
 from pathlib import Path
 
@@ -17,6 +18,24 @@ ROOT = Path(__file__).resolve().parents[1]
 SPEC_PATH = ROOT / "judge" / "questions.v1.json"
 
 _env_loaded = False
+
+
+def configure_stdout() -> None:
+    """Make stdout and stderr UTF-8 so a non-ASCII question cannot kill a run.
+
+    Windows encodes redirected output with the locale codec (cp1252 here), and
+    one Croatian letter in a question title raised UnicodeEncodeError twenty
+    seconds into the 500-question arm A run on 2026-09-19. Encoding errors are
+    replaced rather than raised: a log line is never worth losing a run to.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is None:
+            continue
+        try:
+            reconfigure(encoding="utf-8", errors="replace")
+        except (OSError, ValueError):  # a stream that cannot be reconfigured stays as it is
+            pass
 
 
 def load_env() -> None:

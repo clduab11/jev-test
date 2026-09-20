@@ -35,7 +35,7 @@ from typing import Any
 
 import httpx
 
-from harness.config import ROOT, spec_version, thresholds
+from harness.config import ROOT, configure_stdout, spec_version, thresholds
 from harness.retrieval import fetch as fetchmod
 from harness.retrieval import searxng
 from harness.retrieval.palace import Palace, file_chunk, get_drawers, open_palace
@@ -399,6 +399,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--report", action="store_true", help="print the result-count and engine report and exit")
     parser.add_argument("--replay-check", action="store_true", help="replay every question offline")
     args = parser.parse_args(argv)
+    configure_stdout()
 
     if args.report:
         manifest = load_manifest(args.id)
