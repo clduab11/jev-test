@@ -33,6 +33,8 @@ Blue boxes are decisions Jev makes. Brown boxes are the only places the small mo
 
 ![The pipeline: Jev decides, Gemma writes, MemPalace remembers](assets/pipeline.png)
 
+The numbers on the exits to Abstain are from the 500-question run: the pipeline declined 135 questions (60 at S2, 2 at S3, 44 and 29 at S4) and answered 365. The grader scored 7 of those 365 answers as not attempted, which is where the README's total of 142 comes from.
+
 ```mermaid
 flowchart LR
   Q(["Question"]) --> S0
@@ -60,7 +62,7 @@ flowchart LR
   end
 
   S0 -- "web or both" --> WEB
-  S0 -- "palace or both" --> PAL
+  S0 -- "memory or both" --> PAL
   WEB --> S1
   PAL --> S1
   S1 -- "surviving snippets" --> FETCH
@@ -74,10 +76,12 @@ flowchart LR
   REFINE -. "benchmark replay: the frozen pages" .-> PAL
   S2 -- "not enough, second time" --> ABS(["Abstain"])
   S2 -- "enough" --> S3["S3 Gemma 4 E2B writes<br/>at most 5 sentences, every fact cited"]
+  S3 -- "Gemma says the evidence is not enough" --> ABS
   S3 --> S4
   S4 -- "kept, confidence 0.80 or higher" --> OUT(["Answer with per-claim probabilities"])
   S4 -- "kept claims" --> VER
   S4 -- "nothing survives" --> ABS
+  S4 -- "answer misses the question" --> ABS
   VER -. "recalled next time, judged again" .-> PAL
   EV -.-> PAL
 
