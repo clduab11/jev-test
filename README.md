@@ -1,189 +1,76 @@
 # jev-test
 
-Can a small AI model that runs on a laptop answer questions from the web without making things up, if a separate model makes all the decisions for it? This repository is the test.
+Can a small AI model that runs on a laptop answer questions from the web without making things up, if a separate model makes all the decisions for it? This repository is the test. On 500 questions the judged version cleared three of its four pre-registered bars and missed the one that mattered most: it scored 0.612, below the 0.740 from doing no judging at all. The cause was the search results, not the judge.
 
-The design is written down in [docs/JUDGMENT_SPEC.md](docs/JUDGMENT_SPEC.md). The rules of the benchmark were fixed before the first run so the results cannot be tuned after the fact. Three of the seven versions now run end to end on a 20-question pilot, and the 500-question web snapshot is being frozen for the real run. This file explains the idea in plain language, shows the pilot numbers for what they are, and tells a developer what to build next.
+The rules were fixed before the first run, in [docs/JUDGMENT_SPEC.md](docs/JUDGMENT_SPEC.md). The long version of this page, with the pipeline diagram, the 20-question pilot and the developer notes, is in [docs/DESIGN.md](docs/DESIGN.md).
 
 ## The problem in one paragraph
 
 Small language models are cheap and private. A two-billion-parameter model fits in about three gigabytes of memory and runs on a normal laptop. It writes clear sentences. But when you ask it to look something up, it makes poor decisions. It searches for the wrong thing. It treats junk pages as evidence. It answers when the evidence is missing. It sometimes cites a source that says no such thing. Those failures are decisions. The writing was never the problem. The idea here is to take every decision away from the small model and give it to a model built only for decisions.
 
-## The four pieces
+Gemma 4 E2B writes the answers. TypeSafe's Jev (`jev-1.13.0`) decides whether to search, which pages count, whether there is enough evidence, and whether each sentence is backed by the passage it cites. SearXNG finds the pages and MemPalace stores them.
 
-| Piece | What it is | What it does here | Where it runs |
+## Results on 500 questions
+
+500 SimpleQA questions, drawn with seed 20260919. Search results and page text were frozen on 2026-09-19, so every version saw the same pages. A right answer scores +1, declining scores 0, and a wrong answer scores -1, so a system that knows when to stop does well. The grader is Claude Sonnet 5 with the official SimpleQA prompt. Intervals are bootstrap 95 percent over questions.
+
+| Version | Correct | Wrong | Declined | Main score [95% CI] | Attempted |
+|---|---|---|---|---|---|
+| A, the small model alone | 6 | 153 | 341 | -0.294 [-0.340, -0.254] | 31.8% |
+| B, top 8 pages, no judge | 407 | 37 | 56 | 0.740 [0.688, 0.792] | 88.8% |
+| D, Jev makes every decision | 332 | 26 | 142 | 0.612 [0.562, 0.662] | 71.6% |
+
+The four bars set for version D before the run, as scored by `harness/grading/prereg.py`:
+
+| Bar | Rule | Observed [95% CI] | Result |
 |---|---|---|---|
-| Gemma 4 E2B | A small open model from Google, packaged by Unsloth | Writes the answer. Nothing else. | Your computer |
-| Jev | A model from TypeSafe AI that does not write text. You give it some text and a question with fixed possible answers. It returns the answer and a probability. | Makes every decision: whether to search, which pages count, whether there is enough evidence, and whether each sentence of the answer is backed by its source. | TypeSafe's servers, through an API key |
-| SearXNG | A search engine you host yourself. It asks many public search engines at once and returns the results as data. | Finds candidate web pages. | Your computer |
-| MemPalace | An open memory system that stores text exactly as written and finds it again by meaning. | Keeps every page passage the system fetched, and every sentence that passed verification, so the next question can use them. | Your computer |
+| Share of questions attempted | at least 0.50 | 0.716 [0.676, 0.756] | clears |
+| Share of attempted answers that are wrong | at most 0.10 | 0.073 [0.047, 0.101] | clears |
+| Main score gain over version B | at least 0.15 | -0.128 | misses |
+| Kept sentences the grader finds supported | at least 0.90 | 0.982 [0.972, 0.992] | clears |
 
-Jev is the only piece that is not on your machine. The design includes swappable local judges so the whole thing can run offline. See "What leaves your computer" below.
+The wrong-answer bar clears on the point estimate, but the top of its interval sits at 0.101. Version B's wrong-answer rate is 0.083 [0.057, 0.108], and the two intervals overlap, so this run shows no difference between them on that measure.
 
-## How one question flows
+Version D cost $0.53 for 13,974 judge requests, 27.9 per question.
 
-1. Jev reads the question and decides four things: does this need a search, should it look at the web or at memory or both, how recent must the sources be, and which kind of search (general, news, science, technical).
-2. SearXNG returns up to thirty results. MemPalace returns anything it already holds on the subject.
-3. Jev looks at each result on its own and answers five yes-or-no questions: is it on topic, does it state a usable fact, does it contradict something the question assumed, is it trying to give the AI instructions, and is it mostly advertising or page furniture. Code drops, keeps, or flags each result against fixed thresholds. Code also gives each page a label such as encyclopedia, news, or forum from a short list of well-known sites; the judge sees the label but never assigns it.
-4. The surviving pages, at most five, are fetched, cut into short passages, stored in MemPalace word for word, and judged again the same way. A page that fails to fetch is represented by its search snippet.
-5. The best six passages are chosen by combining three rankings: the search engine's order, MemPalace's similarity score, and Jev's evidence score.
-6. Jev looks at those six together and answers whether they are enough to answer the question. If not, the small model writes one alternative search and the process repeats once. In the benchmark, where the search results are frozen in advance, that second search is a second look at the same frozen pages with the new words. If there is still not enough, the system says so and stops.
-7. Gemma writes an answer of at most five sentences. Every factual sentence must cite a passage by its id.
-8. Jev checks each sentence against only the passages it cites and says supported, contradicted, or unsupported, with a confidence. Sentences below the bar are removed. Then Jev checks whether what is left still answers the question that was asked. If nothing is left, or the answer is about something else, the system says it could not answer.
-9. Sentences that passed with high confidence are stored in MemPalace as verified memory, with their probability and the ids of the evidence they rest on. The next time a related question comes in they are candidates, and they get judged again like any other passage.
+## Why the judged version lost
 
-The small model touches the process in two places: step 6 (one alternative search) and step 7 (the answer).
+Version D declined 142 questions against B's 56. On the 44 it declined because its final check removed every sentence, B answered 38 correctly and 1 wrongly. That looked like the 0.80 confidence gate throwing away good answers, so `scripts/gate_replay.py` replays the gate at every threshold.
 
-## The same flow as a picture
+The gate was not the cause. Only 94 of the 172 removed sentences can come back by moving the threshold; the rest were removed for their label (unsupported, contradicted, no citation, or a citation to a passage that does not exist), and no threshold touches those. Moving the gate all the way to 0.00 recovers 46 questions and reaches 0.688 at most, which is still below B. Raising it does not help either: the wrong-sentence rate among kept sentences goes from 1.77% to 0.83% while the share kept falls to 57.9%. The gate explains at most 0.076 of the 0.128 gap.
 
-Blue boxes are decisions Jev makes. Brown boxes are the only places the small model writes. Green cylinders are MemPalace. Grey is retrieval. The drawn version below is `docs/assets/pipeline.png`, made from the prompt in `docs/assets/pipeline-prompt.md`; the Mermaid source after it is the ground truth.
+The rest is retrieval depth, which this file warned about before the run. While the pages were being frozen, the local search instance lost most of its engines to rate limits and CAPTCHAs, so the 500 questions average 10.7 search results each against the pilot's 28.7. Version D fetches at most 5 pages from what survives its first filter, and with a third as many candidates it ran short of evidence. Version B reads the top 8 pages and stops, so it barely noticed.
 
-![The pipeline: Jev decides, Gemma writes, MemPalace remembers](docs/assets/pipeline.png)
+The replay's numbers below 0.80 use version B's grade on the same question as a stand-in, so they are an upper bound. The 94 sentences that would need grading to replace them are in `results/gate_replay_worklist.jsonl`.
 
-```mermaid
-flowchart LR
-  Q(["Question"]) --> S0
+## What held up
 
-  subgraph JEV["Jev decides: typed answers with probabilities"]
-    direction TB
-    S0["S0 intake<br/>search? web or memory? how recent? which category?"]
-    S1["S1 gate, one passage per call<br/>relevant? usable fact? contradicts premise?<br/>prompt injection? boilerplate?"]
-    S2["S2 sufficiency<br/>enough to answer? do sources conflict?"]
-    S4["S4 verify, one claim per call<br/>supported / contradicted / unsupported, with confidence<br/>then: does the answer address the question?"]
-  end
+The final check worked. 612 of the 623 sentences it kept were supported by their citations (0.982). That count only covers sentences the pipeline chose to keep, across 365 of the 500 questions, so it is not an accuracy figure for the whole pipeline.
 
-  subgraph RET["Retrieval"]
-    direction TB
-    WEB["SearXNG<br/>up to 30 results"]
-    FETCH["fetch and chunk<br/>300 tokens, max 5 pages"]
-    PAL["MemPalace search<br/>verified wing, then evidence wing"]
-  end
+The judge's confidence also works as a control, which is the finding worth reusing. On the 20-question pilot the same pipeline ran with Gemma judging its own work, answering the same questions about the same passages. On the 3,885 judgments both judges made:
 
-  subgraph MEM["MemPalace, local and verbatim"]
-    direction TB
-    EV[("evidence wing")]
-    VER[("verified wing")]
-    QUAR[("quarantine")]
-  end
+![Gate mobility: 11% for Gemma judging itself, 99% for Jev](docs/assets/calibration.png)
 
-  S0 -- "web or both" --> WEB
-  S0 -- "palace or both" --> PAL
-  WEB --> S1
-  PAL --> S1
-  S1 -- "surviving snippets" --> FETCH
-  FETCH -- "every chunk, word for word" --> EV
-  FETCH -- "chunks judged again" --> S1
-  S1 -- "injection" --> QUAR
-  S1 -- "evidence" --> RRF["Rank fusion<br/>engine rank + similarity + evidence score<br/>top 6 passages, 2,500 tokens"]
-  RRF --> S2
-  S2 -- "not enough, first time" --> REFINE["Gemma writes one new query"]
-  REFINE -- "live" --> WEB
-  REFINE -. "benchmark replay: the frozen pages" .-> PAL
-  S2 -- "not enough, second time" --> ABS(["Abstain"])
-  S2 -- "enough" --> S3["S3 Gemma 4 E2B writes<br/>at most 5 sentences, every fact cited"]
-  S3 --> S4
-  S4 -- "kept, confidence 0.80 or higher" --> OUT(["Answer with per-claim probabilities"])
-  S4 -- "kept claims" --> VER
-  S4 -- "nothing survives" --> ABS
-  VER -. "recalled next time, judged again" .-> PAL
-  EV -.-> PAL
+| Same passage, same question (n=3,885) | Gemma judging itself | Jev |
+|---|---|---|
+| Agree on the yes/no call at 0.5 | 82.8% | |
+| Share of answers on its three most common values | 99.6% | 34.4% |
+| Gate mobility | 11% | 99% |
 
-  classDef judge fill:#1f3a5f,stroke:#0b2545,color:#ffffff
-  classDef slm fill:#7a4b00,stroke:#4a2d00,color:#ffffff
-  classDef mem fill:#1e5631,stroke:#0f3d1f,color:#ffffff
-  classDef ret fill:#4a4a4a,stroke:#222222,color:#ffffff
-  class S0,S1,S2,S4 judge
-  class S3,REFINE slm
-  class EV,VER,QUAR mem
-  class WEB,FETCH,PAL,RRF ret
-```
+Gate mobility is the share of 0.01 threshold steps, from 0 to 1, that change which answers get through. At 11%, 89% of the thresholds you could set on Gemma's score give the same result as the one beside them, because its answers sit on 0.00, 1.00 and 0.50. Gemma usually makes the right call; it cannot say how sure it is. A threshold on that score does nothing. The statistics are published at <https://huggingface.co/datasets/clduab11/jev-calibration-statistics>.
 
-## What we measure, and what "working" means
+The Gemma arm used verbalized confidence: it is asked how sure it is and the number is read back. That is the weakest way to get a probability from a small model. Token logprobs and self-consistency vote fractions cost nothing and are likely much better, and neither has been run here. This is not evidence that local models cannot be calibrated.
 
-Seven versions of the system are compared on the same questions with the same frozen search results:
+## A grader bug, fixed before the 500-question grading
 
-| Version | Search | Judge | Writer |
-|---|---|---|---|
-| A | none | none | Gemma |
-| B | yes, all results stuffed in, no judging | none | Gemma |
-| C-laya | yes | Laya, an open decision model that runs locally | Gemma |
-| C-classical | yes | older local tools: a passage ranker and a contradiction checker | Gemma |
-| C-self | yes | Gemma judging itself with the same questions | Gemma |
-| D | yes | Jev | Gemma |
-| E | as B | none | a larger Gemma, to show what size alone buys |
+During development the grader ran with an 8-token output cap. The grading model reasons for about 120 tokens before it writes its one-word verdict, so replies came back empty and the parser counted them as unsupported. The cap was raised, an unreadable reply became its own label that is left out of the rate instead of counted against it, and `tests/test_claim_support.py` pins that behaviour. On the pilot, re-grading moved the self-judge's citation support from 0.704 to 0.926 and left Jev's 0.909 unchanged. The fix landed before the 500-question grading ran, and that run reports 0 unreadable replies.
 
-The questions come from public benchmarks. SimpleQA and FreshQA cover facts found on the web. RGB and CRAG are controlled tests of noise, missing evidence, combining several sources, and false premises. Every answer is scored by a separate frontier model that plays no part in the pipeline. Jev never grades its own work.
+## What this does not show
 
-The main score gives one point for a correct answer, zero for saying "I cannot answer", and minus one for a wrong answer. A system that knows when to stop does well on it.
-
-Before the first run, we committed to what counts as success for version D on the web questions:
-
-| Measure | Bar |
-|---|---|
-| Share of questions it attempts | at least half |
-| Share of attempted answers that are wrong | at most one in ten |
-| Improvement in the main score over version B | at least 0.15 |
-| Share of kept sentences that the separate grader also finds supported | at least nine in ten |
-
-We also wrote down where we expect it to fail: questions that need facts combined from several sources, and questions with a false premise. A decision model can flag a contradiction. It cannot resolve one.
-
-A second experiment runs the same questions twice. The second pass starts with the memory the first pass built. Two bars apply: the second pass must make at most half as many judge requests per question, and its error rate must not rise by more than two points.
-
-## What we found so far
-
-In one sentence: on a 20-question pilot, handing every decision to a decision model took a two-billion-parameter model from 12 right and 4 wrong to 15 right and 0 wrong, at 49 judge calls and under a fifth of a cent per question.
-
-Twenty SimpleQA questions were drawn with a fixed seed, their search results and pages were frozen on 2026-09-19, and versions A, B and D were run on the frozen set. The grader is Claude Sonnet 5 through a local gateway, with the official SimpleQA grading prompt. Intervals are bootstrap 95 percent over questions.
-
-| Version | Correct | Wrong | Declined | Main score [95% CI] | Wrong when attempting [95% CI] | Attempted [95% CI] |
-|---|---|---|---|---|---|---|
-| A, generator alone | 0 | 6 | 14 | -0.30 [-0.50, -0.10] | 1.00 [1.00, 1.00] | 0.30 [0.10, 0.50] |
-| B, naive search, top 8 pages | 12 | 4 | 4 | 0.40 [0.05, 0.75] | 0.25 [0.06, 0.47] | 0.80 [0.60, 0.95] |
-| C-self, small model judges itself | 12 | 3 | 5 | 0.45 [0.10, 0.75] | 0.20 [0.00, 0.43] | 0.75 [0.55, 0.95] |
-| D, Jev decides | 15 | 0 | 5 | 0.75 [0.55, 0.95] | 0.00 [0.00, 0.00] | 0.75 [0.55, 0.95] |
-
-The ceiling for all of them is 0.850. That is the share of these questions whose answer appears anywhere in the frozen pages, measured offline by string match and reported by `harness/grading/recall.py`. No version can answer a question whose answer was never retrieved.
-
-Findings from the pilot, each one checkable in `results/`:
-
-1. With Jev deciding, the small model got 15 of 20 right and none wrong. The same model with the same search results and no judge got 12 right and 4 wrong. Without search it got none right.
-2. The judged version declined 5 questions and wrote down why each time: twice the evidence was not enough after a second search, once every sentence of the draft failed verification, and twice the verified answer was about a neighbouring question.
-3. Verification did real work. Of the 31 cited sentences the small model wrote, 9 were removed before shipping, six of them because the judge's confidence was below 0.80. An outside grader then checked the 22 that shipped and agreed with 20.
-4. The small model invented no citation ids when the judge chose the evidence. The unjudged version invented two on the same questions.
-5. The second search rescued one question. The first pass had judged the right page's snippet off topic; the new query surfaced that page's own text from the frozen set, and it went to the top of the ranking.
-6. Cost: 49 judge requests and about 42,000 judge tokens per question, 3.5 cents for the whole pilot at list price, five seconds per question on a laptop.
-7. Letting the small model judge itself does not work, and the reason is measurable. See below.
-8. Two decisions the judge got wrong cost real answers. On one question it found the correct sentence, rated it supported at 0.76, and the 0.80 gate stripped it. On another it kept a correct fact and then decided the answer did not address the question. Both became declines. The gate is not free.
-
-### The ablation: what a calibrated judge actually buys
-
-Version C-self runs the identical pipeline with identical questions and thresholds. Only the judge changes: the small model answers the typed questions about its own work instead of Jev. It scored 0.45 against naive search at 0.40 and the judged pipeline at 0.75. It sits next to the version with no judge at all.
-
-The reason is not that it judges badly. It is that it cannot express a degree of belief. Across 31 verdicts its confidence took exactly two values, 1.00 thirty times and 0.25 once. Jev's 33 verdicts took 17 distinct values between 0.37 and 1.00.
-
-That makes every threshold in the design inert. Sweeping the confidence gate across its whole range and counting the sentences that survive:
-
-| Gate setting | 0.00 | 0.40 | 0.60 | 0.80 | 0.90 | 1.00 |
-|---|---|---|---|---|---|---|
-| Sentences kept, C-self | 27 | 27 | 27 | 27 | 27 | 27 |
-| Sentences kept, D | 30 | 29 | 26 | 24 | 21 | 10 |
-
-C-self ships the same answer at every setting. The 0.80 gate removed 6 of Jev's 30 supported verdicts and 0 of C-self's 27. A model whose output is always 0 or 1 can never land between two thresholds, so the gate is decorative.
-
-What does survive is the structure. C-self still declined 5 questions, still stripped 4 sentences on the verdict label, never on the confidence, and still invented no citations. So decomposing the work into typed questions helps any model. Calibration is the part you cannot get from the small model, and it is worth 0.30 on this pilot.
-
-One trap the numbers set: C-self's citation support is 0.926, slightly above Jev's 0.909. Its sentences are faithful to what they cite. They are just answers to the wrong question. Faithfulness is not correctness, and a citation-support score on its own will flatter a model that cites carefully and reasons poorly.
-
-### We broke our own measurement, and here is how
-
-The citation-support number above was wrong until 2026-09-20. The grader ran with an 8-token output cap. The grading model deliberates for about 120 tokens before emitting its one-word verdict, so every reply came back empty, and the parser scored an unreadable reply as "unsupported". Every negative citation-support verdict this project ever produced was a truncation. Not one call had ever returned the word.
-
-Raising the cap and re-grading moved C-self from 0.704 to 0.926 and left Jev's 0.909 unchanged. An unreadable reply is now its own label, excluded from the rate and never counted against it, and `tests/test_claim_support.py` pins that. The other three measures never used that path and did not move.
-
-### What this does not show
-
-Twenty questions give wide intervals. Fifteen attempts with no wrong answer is consistent with a true error rate as high as one in five. The 500-question run is in progress and its numbers replace these.
-
-That run also has a thinner snapshot, and the disclosure belongs here before its numbers exist, never afterwards. The home search instance lost most of its engines to rate limits and CAPTCHAs while the pages were being frozen, so the 500 questions average 10.7 search results each against the pilot's 28.7, and 17 have no fetched text at all. Two things follow. The gold answer is still present in the frozen pages for 85.0 percent of questions, exactly as in the pilot, because the results that went missing were ranks 9 to 30 and those rarely held the only copy. But the judged version fetches at most 5 pages out of the survivors of its gate, and with a third as many candidates it will have fewer to choose from, so its share of questions attempted should fall. The naive version reads the top 8 pages and never looked past them, so it loses almost nothing. The thin snapshot is mildly kind to the version we are trying to beat.
+- One dataset, one frozen snapshot, and a thin one. A deeper snapshot could change the ranking of B and D.
+- Every correctness number is agreement with another model. No person graded anything.
+- The calibration comparison covers 21 questions. The 3,885 judgments are many passages per question and move together within a question.
+- Citation support rewards careful citing, not correct answers. On the pilot the self-judge scored 0.926 on it against Jev's 0.909 while answering fewer questions correctly, because it cited carefully and answered neighbouring questions.
 
 ## What leaves your computer
 
@@ -193,71 +80,27 @@ Versions A, B, C-laya, C-classical, and C-self send nothing anywhere. Gemma, Lay
 
 Grading the benchmark sends questions, reference answers, evidence, and answers to the grading model's provider. That is test equipment. It is not part of the product.
 
+
 ## Status
 
 | Item | State |
 |---|---|
-| Design and pre-registered rules | written, see [docs/JUDGMENT_SPEC.md](docs/JUDGMENT_SPEC.md) |
-| Question definitions and thresholds, machine readable | written, see [judge/questions.v1.json](judge/questions.v1.json) |
-| Judge client, search client, page fetching, frozen snapshots, memory helpers | done, with tests that need no network |
-| Versions A, B and D | run end to end on the 20-question pilot, see [CHANGELOG.md](CHANGELOG.md) |
-| The five decision stages, rank fusion, memory write-back | done, each proved with a fake judge |
-| Grading: SimpleQA, citation support, the four bars | done, prompts committed under `harness/grading/prompts/` |
-| 500-question SimpleQA snapshot | freezing, paced, with a re-search pass and versions A, B and D queued behind it in an unattended run (`scripts/run_web_track.py`, log in `results/web_track.log`). At the last probe only DuckDuckGo and Startpage were answering. |
-| FreshQA loader | done; the sheet holds 155 fast-changing questions, so the track uses all of them |
-| Versions C-self, C-laya, C-classical, E | C-self ran on two questions (one right, one wrong at confidence 1.0) and its full pilot is queued in the unattended run; C-laya has a local server shim tested against a stand-in model, with Laya itself not yet installed; C-classical and E are next |
-| Memory experiment (second pass) | the write-back runs; the second pass is next |
+| Design and pre-registered rules | written, [docs/JUDGMENT_SPEC.md](docs/JUDGMENT_SPEC.md) |
+| Questions, criteria and thresholds | [judge/questions.v1.json](judge/questions.v1.json), loaded by the code |
+| Versions A, B and D on 500 SimpleQA questions | run and graded, in `results/` |
+| Gate replay | done, `results/gate_replay.json`; its 94 rescued sentences are not yet graded |
+| Calibration statistics | published on Hugging Face; the raw judge records stay local under TypeSafe's terms |
+| Version C-self | run on the 20-question pilot only |
+| Versions C-laya, C-classical and E | not run |
+| FreshQA track | loader done, not run |
+| Memory experiment (second pass) | write-back runs; the second pass has not |
 | The Space | not started |
 
-## For developers: what to build, in order
+What to run next, in order:
 
-The folder layout as it stands:
-
-```
-jev-test/
-  docs/JUDGMENT_SPEC.md        the design; read it first
-  docs/GITHUB_SETUP.md         how the repository was put on GitHub
-  docs/assets/                 the pipeline figure and the prompt that draws it
-  judge/questions.v1.json      every question, criterion, and threshold; the code loads this
-  harness/
-    judge/
-      base.py                  the Judge protocol, answer types, cache key
-      http.py                  Jev, LitJev, and the Laya shim: anything speaking /v1/systemone
-      adapter.py               Gemma judging itself through system-one-adapter (arm C-self)
-      laya_shim.py             serves Laya on /v1/systemone for arm C-laya
-      classical.py             bge-reranker, an NLI model, and Prompt-Guard (not written yet)
-    retrieval/
-      searxng.py               JSON client
-      palace.py                MemPalace file, search, quarantine, flag helpers
-      fetch.py                 page text and token chunks
-      snapshot.py              freeze and replay
-      fuse.py                  reciprocal rank fusion and the evidence caps
-    generate/openai_compat.py  talks to llama-server or Unsloth Desktop
-    stages/                    s0_intake.py  s1_gate.py  s2_sufficiency.py  s3_generate.py  s4_verify.py  m2_writeback.py
-    arms/                      a_plain.py  b_naive.py  d_jev.py  c_self.py  (c_laya, c_classical, e_ceiling to come)
-    grading/                   crag_score.py  simpleqa.py  claim_support.py  prereg.py  prompts/
-    datasets/                  simpleqa.py  freshqa.py  loaders only, no copied data
-    run.py                     --arm D --dataset simpleqa --snapshot <id>, and --grade
-  tests/                       every stage against a fake judge; no network, no model
-  results/                     committed JSON per arm and dataset
-  snapshots/<id>/manifest.json what was searched and fetched; the palace next to it is not committed
-  space/app.py                 Gradio: a leaderboard tab and a live demo tab (not started)
-  docker/searxng/settings.yml  json output on, limiter off
-  json_cache/                  every judge and grader response; git-ignored
-```
-
-Build order, with what is done:
-
-1. Done. `harness/judge/base.py` and `http.py`. One call to Jev with a fixed state and question, cached to disk. Every other judge is a different base URL.
-2. Done. `retrieval/searxng.py` and `retrieval/snapshot.py`. Freeze the search results and fetched pages for the whole question set into a MemPalace wing named `evidence`. Everything after this replays offline.
-3. Done. Arms A and B.
-4. Done. Stages S0 through S4 and the fusion step, driven by `questions.v1.json`. Then arm D.
-5. In progress. Arms C-self, C-laya, and C-classical, by swapping the judge. C-self runs; on its first two questions the small model's probabilities were exact zeros and ones and it shipped a wrong answer as supported.
-6. Done. Grading with the frontier model, prompts committed.
-7. Half done. Stage M2 writes verified claims; the second-pass memory experiment has not run.
-8. Not started. The Space, reading from `results/`.
-
-Conventions the spec depends on: every judge response is cached by `(model, state, questions)`; thresholds are read from the JSON and never hard-coded; the pinned model id from each response is logged; nothing in the pipeline ever grades the pipeline.
+1. Grade the 94 sentences in `results/gate_replay_worklist.jsonl`, so the replay below 0.80 is measured instead of bounded.
+2. Add two local judges that give graded confidence without a paid API: constrained decoding with token logprobs, and self-consistency over 10 samples. If either reaches Jev's gate mobility, the calibration finding is about verbalized confidence alone.
+3. Freeze a deeper snapshot and run B and D again, to test whether retrieval depth is the whole story.
 
 ## Running it
 
@@ -288,16 +131,12 @@ The grade step prints the score table and, for a judged version, the four bars l
 uv run --with "system-one-adapter[openai]>=0.2.0" python scripts/run_web_track.py --snapshot simpleqa-500-20260919 --n 500 --cself-pilot
 ```
 
-## Sources
 
-The design leans on published work instead of guesses. The full list with dates is in section 14 of the spec. The ones that shaped it most:
+## More
 
-- TypeSafe's cookbooks for classifying retrieved passages, re-ranking, and checking citations. They supply the questions and thresholds used here.
-- TypeSafe's page on Jev's known failure modes. It supplies the design rules.
-- OpenRouter's Jev-verified cascade recipe (September 2026).
-- An independent 9,831-pair evaluation showing that Jev on its own does not beat a good embedding ranker, while Jev combined with one does. That is why the ranking step combines scores.
-- Chen et al. (AAAI 2024) and Yang et al. (NeurIPS 2024) for the benchmark tasks and the scoring.
-- MemPalace's documentation for the memory layer.
+- [docs/DESIGN.md](docs/DESIGN.md): how one question flows, the pipeline diagram, what each version is, the 20-question pilot and its ablation, the developer build order, and the sources the design leans on.
+- [docs/JUDGMENT_SPEC.md](docs/JUDGMENT_SPEC.md): the full design and pre-registered rules.
+- `scripts/export_corpus.py`, `scripts/calibration_figure.py` and `scripts/gate_replay.py` rebuild every number in this file from `json_cache/` and `results/`.
 
 ## License
 
