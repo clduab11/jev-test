@@ -38,7 +38,12 @@ COLOR = {"jev-1.13.0": "#1f3a5f", "gemma-self": "#7a4b00"}
 
 
 def histogram(stats: dict, model: str) -> dict[float, int]:
-    return {float(k): v for k, v in stats["models"][model]["noul"]["histogram_2dp"].items()}
+    """Paired histogram: same state and same question, answered by both models.
+
+    The unpaired histograms compare a 21-question self-judge run against a 500-question Jev run,
+    which is not a fair comparison. Paired is.
+    """
+    return {float(k): v for k, v in stats["paired"]["models"][model]["histogram_2dp"].items()}
 
 
 def accept_curve(hist: dict[float, int], steps: int = 101):
@@ -67,7 +72,8 @@ def main() -> None:
 
     root = Path(__file__).resolve().parents[1]
     stats = json.loads((root / args.stats).read_text(encoding="utf-8"))
-    models = [m for m in ("gemma-self", "jev-1.13.0") if m in stats["models"]]
+    models = [m for m in ("gemma-self", "jev-1.13.0") if m in stats["paired"]["models"]]
+    paired = stats["paired"]
 
     fig, (left, right) = plt.subplots(1, 2, figsize=(13.5, 5.2))
 
@@ -105,11 +111,13 @@ def main() -> None:
             linewidth=2.2,
             label=f"{LABEL[model]}  (mobility {move:.0%})",
         )
+        top3 = sum(sorted(hist.values(), reverse=True)[:3]) / total
         summary.append(
             {
                 "model": model,
                 "n": total,
-                "distinct_values_2dp": stats["models"][model]["noul"]["distinct_values_2dp"],
+                "distinct_values_2dp": len(hist),
+                "mass_top3_values": round(top3, 4),
                 "mass_interior_0.10_0.90": round(interior, 4),
                 "gate_mobility": round(move, 4),
             }
@@ -132,9 +140,11 @@ def main() -> None:
     right.set_ylim(-0.02, 1.02)
 
     fig.suptitle(
-        "A threshold is only a control surface if the score underneath it moves",
-        fontsize=13,
-        y=0.99,
+        "A threshold is only a control surface if the score underneath it moves\n"
+        f"{paired['judgments']:,} identical judgments: same state, same question, both models "
+        f"({paired['distinct_questions']} questions)",
+        fontsize=12,
+        y=0.995,
     )
     fig.tight_layout(rect=(0, 0, 1, 0.96))
 
@@ -144,7 +154,19 @@ def main() -> None:
     fig.savefig(out.with_suffix(".svg"))
 
     metrics = root / "corpus/public/calibration_metrics.json"
-    metrics.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    metrics.write_text(
+        json.dumps(
+            {
+                "comparison": "paired: same state and same question id, answered by both models",
+                "judgments": paired["judgments"],
+                "distinct_questions": paired["distinct_questions"],
+                "binary_agreement_at_0.5": paired.get("binary_agreement_at_0.5"),
+                "models": summary,
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
 
     print(f"figure  {out.relative_to(root)}")
     print(f"figure  {out.with_suffix('.svg').relative_to(root)}")

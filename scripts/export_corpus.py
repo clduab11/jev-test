@@ -173,14 +173,49 @@ def main() -> None:
             },
         }
 
+    # ---- paired: same state AND same question id, answered by both ------
+    # The unpaired comparison is not apples to apples: the self-judge arm only ran on the pilot,
+    # while Jev ran on all 500 questions. Restricting to identical (state, question) pairs is the
+    # comparison that holds up. Still aggregate - histograms, not rows.
+    paired_set = set(paired)
+    by_key: dict[str, dict] = defaultdict(dict)
+    for family, rows in rows_by_model.items():
+        for r in rows:
+            if r["primitive"] == "noul" and r["value"] is not None and r["state_id"] in paired_set:
+                by_key[family][(r["state_id"], r["question_id"])] = float(r["value"])
+    families = sorted(by_key)
+    shared = sorted(set.intersection(*(set(by_key[f]) for f in families))) if families else []
+    queries = {
+        (r["state"] or {}).get("query")
+        for rows in rows_by_model.values()
+        for r in rows
+        if r["state_id"] in paired_set and isinstance(r["state"], dict)
+    }
+    stats["paired"] = {
+        "note": "Same state and same question id, answered by both models.",
+        "judgments": len(shared),
+        "distinct_questions": len(queries - {None}),
+        "models": {},
+    }
+    for family in families:
+        hist = Counter(round(by_key[family][k], 2) for k in shared)
+        stats["paired"]["models"][family] = {
+            "histogram_2dp": {f"{k:.2f}": v for k, v in sorted(hist.items())}
+        }
+    if len(families) == 2 and shared:
+        a, b = families
+        agree = sum(1 for k in shared if (by_key[a][k] >= 0.5) == (by_key[b][k] >= 0.5))
+        stats["paired"]["binary_agreement_at_0.5"] = round(agree / len(shared), 4)
+
     (pub_dir / "statistics.json").write_text(
         json.dumps(stats, indent=2, ensure_ascii=False), encoding="utf-8"
     )
 
+    # The viewer table is the PAIRED histogram, since that is the comparison that holds up.
     with (pub_dir / "noul_histogram.csv").open("w", encoding="utf-8") as handle:
         handle.write("model,probability,count\n")
-        for family, blob in stats["models"].items():
-            for value, count in blob["noul"]["histogram_2dp"].items():
+        for family, blob in stats["paired"]["models"].items():
+            for value, count in blob["histogram_2dp"].items():
                 handle.write(f"{family},{value},{count}\n")
 
     print(f"pub   {(pub_dir / 'statistics.json').relative_to(root)}")
