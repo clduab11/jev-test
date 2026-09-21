@@ -1,0 +1,71 @@
+{
+  "label": "gold answer string appears in passage text (harness/grading/recall.py normalize)",
+  "short_answer_chars_excluded": 4,
+  "question": "contains_answer_evidence",
+  "A_jev_all_questions": {
+    "auroc": 0.8989690506568985,
+    "positives": 2174,
+    "negatives": 6901,
+    "ci": [
+      0.8813978866082754,
+      0.916266518890009
+    ],
+    "clusters": 349
+  },
+  "B_paired": {
+    "passages": 473,
+    "jev": {
+      "auroc": 0.9263997679141283,
+      "positives": 90,
+      "negatives": 383,
+      "ci": [
+        0.8572097717631654,
+        0.9769662717499665
+      ],
+      "clusters": 12
+    },
+    "local_self_judge": {
+      "auroc": 0.8044966637655933,
+      "positives": 90,
+      "negatives": 383,
+      "ci": [
+        0.7228707277507028,
+        0.8521564240489409
+      ],
+      "clusters": 12
+    },
+    "difference_jev_minus_local": 0.121903104148535,
+    "difference_ci": [
+      0.0463552768329555,
+      0.19881917209777025
+    ]
+  },
+  "C_within_local_buckets": {
+    "1.00": {
+      "passages": 189,
+      "share_containing_answer": 0.4021164021164021,
+      "auroc": 0.8353516534699581,
+      "positives": 76,
+      "negatives": 113,
+      "ci": [
+        0.6615494464920038,
+        0.9550768760115265
+      ],
+      "clusters": 12
+    },
+    "0.50": {
+      "passages": 33,
+      "share_containing_answer": 0.2727272727272727,
+      "too_small": true,
+      "positives": 9,
+      "negatives": 24
+    },
+    "0.00": {
+      "passages": 249,
+      "share_containing_answer": 0.020080321285140562,
+      "too_small": true,
+      "positives": 5,
+      "negatives": 244
+    }
+  }
+}
