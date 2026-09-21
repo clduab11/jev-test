@@ -1,0 +1,16 @@
+[
+  {
+    "model": "gemma-self",
+    "n": 5065,
+    "distinct_values_2dp": 19,
+    "mass_interior_0.10_0.90": 0.0952,
+    "gate_mobility": 0.18
+  },
+  {
+    "model": "jev-1.13.0",
+    "n": 64964,
+    "distinct_values_2dp": 99,
+    "mass_interior_0.10_0.90": 0.2929,
+    "gate_mobility": 0.99
+  }
+]

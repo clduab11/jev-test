@@ -1,0 +1,208 @@
+{
+  "shipped_gate": 0.8,
+  "graded_kept_claims": 623,
+  "stripped_by_reason": {
+    "supported_low_confidence": 94,
+    "unsupported": 25,
+    "uncited_claim": 26,
+    "contradicted_low_confidence": 17,
+    "fabricated_citation": 10
+  },
+  "rescuable_claims": 94,
+  "raise_gate_curve": [
+    {
+      "threshold": 0.8,
+      "kept": 623,
+      "unsupported": 11
+    },
+    {
+      "threshold": 0.82,
+      "kept": 614,
+      "unsupported": 11
+    },
+    {
+      "threshold": 0.84,
+      "kept": 603,
+      "unsupported": 10
+    },
+    {
+      "threshold": 0.86,
+      "kept": 596,
+      "unsupported": 10
+    },
+    {
+      "threshold": 0.88,
+      "kept": 576,
+      "unsupported": 10
+    },
+    {
+      "threshold": 0.9,
+      "kept": 553,
+      "unsupported": 7
+    },
+    {
+      "threshold": 0.92,
+      "kept": 522,
+      "unsupported": 7
+    },
+    {
+      "threshold": 0.94,
+      "kept": 490,
+      "unsupported": 6
+    },
+    {
+      "threshold": 0.96,
+      "kept": 449,
+      "unsupported": 4
+    },
+    {
+      "threshold": 0.98,
+      "kept": 361,
+      "unsupported": 3
+    },
+    {
+      "threshold": 1.0,
+      "kept": 171,
+      "unsupported": 0
+    }
+  ],
+  "lower_gate_proxy_ceiling": [
+    {
+      "threshold": 0.0,
+      "claims_rescued": 94,
+      "questions_unabstained": 46,
+      "b_correct": 40,
+      "b_incorrect": 2,
+      "ceiling_truthfulness": 0.688
+    },
+    {
+      "threshold": 0.05,
+      "claims_rescued": 94,
+      "questions_unabstained": 46,
+      "b_correct": 40,
+      "b_incorrect": 2,
+      "ceiling_truthfulness": 0.688
+    },
+    {
+      "threshold": 0.1,
+      "claims_rescued": 94,
+      "questions_unabstained": 46,
+      "b_correct": 40,
+      "b_incorrect": 2,
+      "ceiling_truthfulness": 0.688
+    },
+    {
+      "threshold": 0.15,
+      "claims_rescued": 94,
+      "questions_unabstained": 46,
+      "b_correct": 40,
+      "b_incorrect": 2,
+      "ceiling_truthfulness": 0.688
+    },
+    {
+      "threshold": 0.2,
+      "claims_rescued": 94,
+      "questions_unabstained": 46,
+      "b_correct": 40,
+      "b_incorrect": 2,
+      "ceiling_truthfulness": 0.688
+    },
+    {
+      "threshold": 0.25,
+      "claims_rescued": 93,
+      "questions_unabstained": 46,
+      "b_correct": 40,
+      "b_incorrect": 2,
+      "ceiling_truthfulness": 0.688
+    },
+    {
+      "threshold": 0.3,
+      "claims_rescued": 87,
+      "questions_unabstained": 44,
+      "b_correct": 38,
+      "b_incorrect": 2,
+      "ceiling_truthfulness": 0.684
+    },
+    {
+      "threshold": 0.35,
+      "claims_rescued": 81,
+      "questions_unabstained": 41,
+      "b_correct": 35,
+      "b_incorrect": 2,
+      "ceiling_truthfulness": 0.678
+    },
+    {
+      "threshold": 0.4,
+      "claims_rescued": 77,
+      "questions_unabstained": 40,
+      "b_correct": 34,
+      "b_incorrect": 2,
+      "ceiling_truthfulness": 0.676
+    },
+    {
+      "threshold": 0.45,
+      "claims_rescued": 73,
+      "questions_unabstained": 37,
+      "b_correct": 32,
+      "b_incorrect": 2,
+      "ceiling_truthfulness": 0.672
+    },
+    {
+      "threshold": 0.5,
+      "claims_rescued": 67,
+      "questions_unabstained": 33,
+      "b_correct": 28,
+      "b_incorrect": 2,
+      "ceiling_truthfulness": 0.664
+    },
+    {
+      "threshold": 0.55,
+      "claims_rescued": 59,
+      "questions_unabstained": 30,
+      "b_correct": 25,
+      "b_incorrect": 2,
+      "ceiling_truthfulness": 0.658
+    },
+    {
+      "threshold": 0.6,
+      "claims_rescued": 49,
+      "questions_unabstained": 24,
+      "b_correct": 20,
+      "b_incorrect": 2,
+      "ceiling_truthfulness": 0.648
+    },
+    {
+      "threshold": 0.65,
+      "claims_rescued": 43,
+      "questions_unabstained": 20,
+      "b_correct": 16,
+      "b_incorrect": 2,
+      "ceiling_truthfulness": 0.64
+    },
+    {
+      "threshold": 0.7,
+      "claims_rescued": 34,
+      "questions_unabstained": 16,
+      "b_correct": 13,
+      "b_incorrect": 2,
+      "ceiling_truthfulness": 0.634
+    },
+    {
+      "threshold": 0.75,
+      "claims_rescued": 18,
+      "questions_unabstained": 9,
+      "b_correct": 6,
+      "b_incorrect": 2,
+      "ceiling_truthfulness": 0.62
+    },
+    {
+      "threshold": 0.8,
+      "claims_rescued": 0,
+      "questions_unabstained": 0,
+      "b_correct": 0,
+      "b_incorrect": 0,
+      "ceiling_truthfulness": 0.612
+    }
+  ],
+  "caveat": "Rows below 0.80 are an UPPER BOUND computed from arm B's grades on the same questions, not a measurement of arm D's rescued answers. Grade results/gate_replay_worklist.jsonl to replace them."
+}

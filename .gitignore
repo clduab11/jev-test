@@ -38,3 +38,7 @@ Thumbs.db
 # unattended run logs
 results/*.log
 results/*.stdout
+
+# Local-only: full Jev output triples. Not published (MCA 2.3(b), third-party page text).
+corpus/raw/
+results/*.log.crashed-*
